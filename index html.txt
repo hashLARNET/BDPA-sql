@@ -1,0 +1,2535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDPA - Base de Datos de Progreso Automatizado</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-color: #2ecc71;
+            --secondary-dark: #27ae60;
+            --danger-color: #e74c3c;
+            --danger-dark: #c0392b;
+            --warning-color: #f39c12;
+            --warning-dark: #e67e22;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 60px;
+            margin-right: 15px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .logo-subtext {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-top: 5px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .user-role {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-top: 5px;
+        }
+
+        .logout-btn {
+            color: var(--danger-color);
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        h2 {
+            color: var(--dark-color);
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        /* Estilos para las secciones principales */
+        #login-container {
+            max-width: 400px;
+        }
+
+        #main-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .menu-card i {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .menu-card h3 {
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .menu-card p {
+            color: var(--gray-color);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Estilos para formularios */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Estilos para botones */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: var(--warning-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Estilos para la tabla de consultas */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .badge-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .badge-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        /* Estilos para los avances */
+        .avances-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .avance-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #eee;
+        }
+
+        .avance-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .avance-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Clases utilitarias */
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilos para filtros */
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        /* Estilos para la paginación */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            min-width: 40px;
+        }
+
+        /* Estilos para pestañas */
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .nav-item {
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            padding: 10px 15px;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            color: var(--dark-color);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            border-color: #ddd;
+            background-color: #f8f9fa;
+        }
+
+        .nav-link.active {
+            border-color: #ddd #ddd #fff;
+            background-color: white;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            padding: 20px 0;
+        }
+
+        /* Estilos para texto de peligro (stock bajo) */
+        .text-danger {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        /* Estilos para botones pequeños */
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        /* Estilos específicos para inventario */
+        .stock-zero {
+            background-color: #ffdddd;
+        }
+        
+        .stock-low {
+            background-color: #fff3cd;
+        }
+        
+        .stock-ok {
+            background-color: #d4edda;
+        }
+
+        /* Notificaciones */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            color: white;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
+        }
+
+        .notification.success {
+            background-color: var(--secondary-color);
+        }
+
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Contenedor de Login -->
+    <div id="login-container" class="container">
+        <div class="logo-container">
+            <img src="https://via.placeholder.com/60x60?text=BDPA" alt="Logo BDPA" class="logo">
+            <div>
+                <div class="logo-text">BDPA</div>
+                <div class="logo-subtext">Base de Datos de Progreso Automatizado</div>
+            </div>
+        </div>
+        <h2 class="text-center">Iniciar Sesión</h2>
+        <div class="form-group">
+            <label for="username"><i class="fas fa-user"></i> Usuario:</label>
+            <input type="text" id="username" placeholder="Ingrese su usuario">
+        </div>
+        <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> Contraseña:</label>
+            <input type="password" id="password" placeholder="Ingrese su contraseña">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="iniciarSesion()">
+            <i class="fas fa-sign-in-alt"></i> Ingresar
+        </button>
+        <div id="login-loader" class="loader hidden"></div>
+        <div id="login-error" class="mt-20 text-danger hidden"></div>
+    </div>
+
+    <!-- Menú Principal -->
+    <div id="main-menu-container" class="container hidden fade-in">
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://via.placeholder.com/60x60?text=BDPA" alt="Logo BDPA" class="logo">
+                <div>
+                    <div class="logo-text">BDPA</div>
+                    <div class="logo-subtext">Base de Datos de Progreso Automatizado</div>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="current-user"></div>
+                <div class="user-role" id="current-role"></div>
+                <a class="logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+            </div>
+        </div>
+
+        <div id="main-menu">
+            <div class="menu-card" onclick="mostrarSeccion('registrar-avance')">
+                <i class="fas fa-tasks"></i>
+                <h3>Registrar Avance</h3>
+                <p>Registra nuevos avances en las obras</p>
+            </div>
+            
+            <div class="menu-card" onclick="mostrarSeccion('consultar-avances')" id="consultar-btn">
+                <i class="fas fa-search"></i>
+                <h3>Consultar Avances</h3>
+                <p>Consulta el progreso de las obras</p>
+            </div>
+            
+            <div class="menu-card" onclick="mostrarSeccion('gestion-obras')" id="gestion-obras-btn">
+                <i class="fas fa-building"></i>
+                <h3>Gestión de Obras</h3>
+                <p>Administra las obras disponibles</p>
+            </div>
+            
+            <div class="menu-card" onclick="mostrarSeccion('gestion-inventario')" id="gestion-inventario-btn">
+                <i class="fas fa-boxes"></i>
+                <h3>Gestión de Inventario</h3>
+                <p>Administra materiales y stock</p>
+            </div>
+            
+            <div class="menu-card" onclick="mostrarSeccion('gestion-usuarios')" id="gestion-usuarios-btn">
+                <i class="fas fa-users"></i>
+                <h3>Gestión de Usuarios</h3>
+                <p>Administra los usuarios del sistema</p>
+            </div>
+            
+            <div class="menu-card" onclick="mostrarSeccion('reportes')" id="reportes-btn">
+                <i class="fas fa-chart-bar"></i>
+                <h3>Reportes</h3>
+                <p>Genera reportes de progreso</p>
+            </div>
+            
+            <div class="menu-card" onclick="mostrarSeccion('configuracion')" id="configuracion-btn">
+                <i class="fas fa-cog"></i>
+                <h3>Configuración</h3>
+                <p>Configura el sistema</p>
+            </div>
+            
+            <div class="menu-card" onclick="mostrarSeccion('gestion-avances')" id="gestion-avances-btn">
+                <i class="fas fa-list-check"></i>
+                <h3>Tipos de Avance</h3>
+                <p>Administra los tipos de avance disponibles</p>
+            </div>
+        </div>
+    </div>
+    <!-- Sección de Registrar Avance -->
+    <div id="registrar-avance" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-tasks"></i> Registrar Avance</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <div class="form-group">
+            <label for="obra-avance">Obra:</label>
+            <select id="obra-avance" onchange="cargarAvancesObra()">
+                <option value="">Seleccione una obra</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="piso">Piso:</label>
+            <input type="number" id="piso" placeholder="Ejemplo: 4">
+        </div>
+        
+        <div class="form-group">
+            <label for="departamento">Departamento:</label>
+            <input type="text" id="departamento" placeholder="Ejemplo: 407">
+        </div>
+        
+        <div id="avances-container">
+            <h3>Avances realizados:</h3>
+            <div id="avances-especificos" class="avances-container">
+                <!-- Los avances específicos se cargarán dinámicamente según la obra -->
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="observaciones">Observaciones:</label>
+            <textarea id="observaciones" placeholder="Ingrese cualquier observación adicional"></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="registrarAvance()">
+                <i class="fas fa-save"></i> Guardar Avance
+            </button>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
+        <div id="avance-loader" class="loader hidden"></div>
+    </div>
+
+    <!-- Sección de Consultar Avances -->
+    <div id="consultar-avances" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-search"></i> Consultar Avances</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <div class="filters">
+            <div class="form-group">
+                <label for="filtro-obra">Obra:</label>
+                <select id="filtro-obra">
+                    <option value="">Todas las obras</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="filtro-piso">Piso:</label>
+                <input type="number" id="filtro-piso" placeholder="Filtrar por piso">
+            </div>
+            
+            <div class="form-group">
+                <label for="filtro-depto">Departamento:</label>
+                <input type="text" id="filtro-depto" placeholder="Filtrar por departamento">
+            </div>
+            
+            <div class="form-group">
+                <label for="filtro-fecha">Fecha:</label>
+                <input type="date" id="filtro-fecha">
+            </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="filtrarAvances()">
+            <i class="fas fa-filter"></i> Aplicar Filtros
+        </button>
+        <button class="btn btn-secondary" onclick="limpiarFiltrosAvances()">
+            <i class="fas fa-eraser"></i> Limpiar Filtros
+        </button>
+        
+        <div class="table-container">
+            <table id="tabla-avances">
+                <thead>
+                    <tr>
+                        <th>Obra</th>
+                        <th>Piso</th>
+                        <th>Depto</th>
+                        <th>Avances</th>
+                        <th>Fecha</th>
+                        <th>Registrado por</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="avances-tbody">
+                    <!-- Los avances se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+            <button class="btn" onclick="cambiarPagina(-1)"><i class="fas fa-chevron-left"></i></button>
+            <span id="pagina-actual">1</span>
+            <button class="btn" onclick="cambiarPagina(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div id="consulta-loader" class="loader hidden"></div>
+    </div>
+    <!-- Sección de Gestión de Obras -->
+    <div id="gestion-obras" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-building"></i> Gestión de Obras</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <button class="btn btn-primary mb-20" onclick="mostrarFormularioObra()">
+            <i class="fas fa-plus"></i> Nueva Obra
+        </button>
+        
+        <div id="formulario-obra" class="hidden">
+            <input type="hidden" id="obra-id">
+            <div class="form-group">
+                <label for="nombre-obra">Nombre de la obra:</label>
+                <input type="text" id="nombre-obra" placeholder="Ingrese el nombre de la obra">
+            </div>
+            
+            <div class="form-group">
+                <label for="direccion-obra">Dirección:</label>
+                <input type="text" id="direccion-obra" placeholder="Ingrese la dirección de la obra">
+            </div>
+            
+            <div class="form-group">
+                <label for="fecha-inicio">Fecha de inicio:</label>
+                <input type="date" id="fecha-inicio">
+            </div>
+            
+            <div class="form-group">
+                <label for="fecha-termino">Fecha estimada de término:</label>
+                <input type="date" id="fecha-termino">
+            </div>
+            
+            <div class="form-group">
+                <label for="tipo-obra">Tipo de obra:</label>
+                <select id="tipo-obra">
+                    <option value="residencial">Residencial</option>
+                    <option value="comercial">Comercial</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="infraestructura">Infraestructura</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="estado-obra">Estado:</label>
+                <select id="estado-obra">
+                    <option value="Planificación">Planificación</option>
+                    <option value="En progreso">En progreso</option>
+                    <option value="Finalizada">Finalizada</option>
+                    <option value="Suspendida">Suspendida</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="avances-obra">Avances asociados:</label>
+                <select id="avances-obra" multiple style="height: 150px;">
+                    <!-- Se llenará dinámicamente con los tipos de avance disponibles -->
+                </select>
+                <small class="text-muted">Mantén presionada la tecla Ctrl para seleccionar múltiples avances</small>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="guardarObra()">
+                    <i class="fas fa-save"></i> Guardar Obra
+                </button>
+                <button class="btn btn-danger" onclick="cancelarEdicionObra()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="tabla-obras">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>Inicio</th>
+                        <th>Término</th>
+                        <th>Estado</th>
+                        <th>Avance</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="obras-tbody">
+                    <!-- Las obras se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        <div id="obras-loader" class="loader hidden"></div>
+    </div>
+
+    <!-- Sección de Gestión de Tipos de Avance -->
+    <div id="gestion-avances" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-list-check"></i> Gestión de Tipos de Avance</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <button class="btn btn-primary mb-20" onclick="mostrarFormularioTipoAvance()">
+            <i class="fas fa-plus"></i> Nuevo Tipo de Avance
+        </button>
+        
+        <div id="formulario-tipo-avance" class="hidden">
+            <input type="hidden" id="tipo-avance-id">
+            <div class="form-group">
+                <label for="nombre-tipo-avance">Nombre del tipo de avance:</label>
+                <input type="text" id="nombre-tipo-avance" placeholder="Ej: Instalación eléctrica">
+            </div>
+            
+            <div class="form-group">
+                <label for="descripcion-tipo-avance">Descripción:</label>
+                <textarea id="descripcion-tipo-avance" placeholder="Descripción detallada del tipo de avance"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoria-tipo-avance">Categoría:</label>
+                <select id="categoria-tipo-avance">
+                    <option value="electricidad">Electricidad</option>
+                    <option value="fontaneria">Fontanería</option>
+                    <option value="construccion">Construcción</option>
+                    <option value="acabados">Acabados</option>
+                    <option value="otros">Otros</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="color-tipo-avance">Color:</label>
+                <input type="color" id="color-tipo-avance" value="#3498db">
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="guardarTipoAvance()">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <button class="btn btn-danger" onclick="cancelarEdicionTipoAvance()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="tabla-tipos-avance">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Categoría</th>
+                        <th>Color</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tipos-avance-tbody">
+                    <!-- Los tipos de avance se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        <div id="tipos-avance-loader" class="loader hidden"></div>
+    </div>
+    <!-- Sección de Gestión de Inventario -->
+    <div id="gestion-inventario" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-boxes"></i> Gestión de Inventario</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <ul class="nav nav-tabs mb-20">
+            <li class="nav-item">
+                <a class="nav-link active" onclick="mostrarTabInventario('consultar')">Consultar</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="mostrarTabInventario('entradas')">Entradas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="mostrarTabInventario('salidas')">Salidas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="mostrarTabInventario('movimientos')">Movimientos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="mostrarTabInventario('categorias')">Categorías</a>
+            </li>
+        </ul>
+        
+        <!-- Pestaña de Consulta -->
+        <div id="inventario-consultar" class="tab-content">
+            <div class="filters">
+                <div class="form-group">
+                    <label for="filtro-categoria">Categoría:</label>
+                    <select id="filtro-categoria">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filtro-stock">
+                        <input type="checkbox" id="filtro-stock"> Mostrar solo bajo stock
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="buscar-material">Buscar:</label>
+                    <input type="text" id="buscar-material" placeholder="Nombre, código o descripción">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary mb-20" onclick="filtrarInventario()">
+                <i class="fas fa-filter"></i> Aplicar Filtros
+            </button>
+            
+            <button class="btn btn-secondary mb-20" onclick="mostrarFormularioMaterial()">
+                <i class="fas fa-plus"></i> Nuevo Material
+            </button>
+            
+            <div id="formulario-material" class="hidden mb-20">
+                <input type="hidden" id="material-id">
+                <div class="form-group">
+                    <label for="codigo-material">Código:</label>
+                    <input type="text" id="codigo-material" placeholder="Código único del material">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nombre-material">Nombre:</label>
+                    <input type="text" id="nombre-material" placeholder="Nombre descriptivo">
+                </div>
+                
+                <div class="form-group">
+                    <label for="descripcion-material">Descripción:</label>
+                    <textarea id="descripcion-material" placeholder="Descripción detallada"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoria-material">Categoría:</label>
+                    <select id="categoria-material">
+                        <option value="">Seleccione una categoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stock-material">Stock inicial:</label>
+                    <input type="number" id="stock-material" min="0" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="stock-minimo-material">Stock mínimo:</label>
+                    <input type="number" id="stock-minimo-material" min="0" value="5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="unidad-material">Unidad de medida:</label>
+                    <select id="unidad-material">
+                        <option value="unidad">Unidad</option>
+                        <option value="metro">Metro</option>
+                        <option value="litro">Litro</option>
+                        <option value="kilogramo">Kilogramo</option>
+                        <option value="caja">Caja</option>
+                        <option value="paquete">Paquete</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ubicacion-material">Ubicación:</label>
+                    <input type="text" id="ubicacion-material" placeholder="Ubicación en bodega">
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="guardarMaterial()">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button class="btn btn-danger" onclick="cancelarEdicionMaterial()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table id="tabla-inventario">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th>Mínimo</th>
+                            <th>Unidad</th>
+                            <th>Ubicación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventario-tbody">
+                        <!-- Los items se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pestaña de Entradas -->
+        <div id="inventario-entradas" class="tab-content hidden">
+            <div class="form-group">
+                <label for="material-entrada">Material:</label>
+                <select id="material-entrada" onchange="actualizarDetallesMaterial()">
+                    <option value="">Seleccione un material</option>
+                </select>
+                <div id="detalles-material" class="mt-20" style="font-size: 14px; color: var(--dark-color); display: none;">
+                    <p><strong>Stock actual:</strong> <span id="stock-actual">0</span> <span id="unidad-actual"></span></p>
+                    <p><strong>Stock mínimo:</strong> <span id="minimo-actual">0</span></p>
+                    <p><strong>Ubicación:</strong> <span id="ubicacion-actual">N/A</span></p>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="cantidad-entrada">Cantidad:</label>
+                <input type="number" id="cantidad-entrada" min="1" step="0.01">
+            </div>
+            
+            <div class="form-group">
+                <label for="origen-entrada">Proveedor/Origen:</label>
+                <input type="text" id="origen-entrada" placeholder="Nombre del proveedor o origen">
+            </div>
+            
+            <div class="form-group">
+                <label for="costo-entrada">Costo unitario ($):</label>
+                <input type="number" id="costo-entrada" min="0" step="0.01">
+            </div>
+            
+            <div class="form-group">
+                <label for="comentario-entrada">Comentario:</label>
+                <textarea id="comentario-entrada" placeholder="Factura, observaciones, etc."></textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="registrarEntrada()">
+                <i class="fas fa-plus-circle"></i> Registrar Entrada
+            </button>
+            <div id="entrada-loader" class="loader hidden"></div>
+        </div>
+        
+        <!-- Pestaña de Salidas -->
+        <div id="inventario-salidas" class="tab-content hidden">
+            <div class="form-group">
+                <label for="material-salida">Material:</label>
+                <select id="material-salida" onchange="actualizarStockDisponible()">
+                    <option value="">Seleccione un material</option>
+                </select>
+                <div id="stock-disponible" class="mt-20" style="font-size: 14px; color: var(--dark-color);">
+                    Stock disponible: <span id="stock-disponible-valor">0</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="cantidad-salida">Cantidad:</label>
+                <input type="number" id="cantidad-salida" min="0.01" step="0.01">
+            </div>
+            
+            <div class="form-group">
+                <label for="destino-salida">Obra/Destino:</label>
+                <select id="destino-salida">
+                    <option value="">Seleccione destino</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="comentario-salida">Comentario:</label>
+                <textarea id="comentario-salida" placeholder="Motivo de salida, observaciones"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="prioridad-salida">Prioridad:</label>
+                <select id="prioridad-salida">
+                    <option value="Normal">Normal</option>
+                    <option value="Urgente">Urgente</option>
+                    <option value="Crítico">Crítico</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="registrarSalida()">
+                <i class="fas fa-minus-circle"></i> Registrar Salida
+            </button>
+            <div id="salida-loader" class="loader hidden"></div>
+        </div>
+        
+        <!-- Pestaña de Movimientos -->
+        <div id="inventario-movimientos" class="tab-content hidden">
+            <div class="filters">
+                <div class="form-group">
+                    <label for="filtro-tipo-movimiento">Tipo:</label>
+                    <select id="filtro-tipo-movimiento">
+                        <option value="">Todos</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="salida">Salida</option>
+                        <option value="ajuste">Ajuste</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filtro-material-movimiento">Material:</label>
+                    <select id="filtro-material-movimiento">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filtro-fecha-desde">Desde:</label>
+                    <input type="date" id="filtro-fecha-desde">
+                </div>
+                
+                <div class="form-group">
+                    <label for="filtro-fecha-hasta">Hasta:</label>
+                    <input type="date" id="filtro-fecha-hasta">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary mb-20" onclick="filtrarMovimientos()">
+                <i class="fas fa-filter"></i> Aplicar Filtros
+            </button>
+            
+            <button class="btn btn-secondary mb-20" onclick="exportarMovimientos()">
+                <i class="fas fa-file-export"></i> Exportar a CSV
+            </button>
+            
+            <div class="table-container">
+                <table id="tabla-movimientos">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Material</th>
+                            <th>Cantidad</th>
+                            <th>Origen/Destino</th>
+                            <th>Usuario</th>
+                            <th>Comentario</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movimientos-tbody">
+                        <!-- Los movimientos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pestaña de Categorías -->
+        <div id="inventario-categorias" class="tab-content hidden">
+            <button class="btn btn-primary mb-20" onclick="mostrarFormularioCategoria()">
+                <i class="fas fa-plus"></i> Nueva Categoría
+            </button>
+            
+            <div id="formulario-categoria" class="hidden mb-20">
+                <input type="hidden" id="categoria-id">
+                <div class="form-group">
+                    <label for="nombre-categoria">Nombre:</label>
+                    <input type="text" id="nombre-categoria" placeholder="Nombre de la categoría">
+                </div>
+                
+                <div class="form-group">
+                    <label for="descripcion-categoria">Descripción:</label>
+                    <textarea id="descripcion-categoria" placeholder="Descripción de la categoría"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color-categoria">Color identificador:</label>
+                    <input type="color" id="color-categoria" value="#3498db">
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="guardarCategoria()">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button class="btn btn-danger" onclick="cancelarEdicionCategoria()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table id="tabla-categorias">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Color</th>
+                            <th>Materiales</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categorias-tbody">
+                        <!-- Las categorías se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Sección de Gestión de Usuarios -->
+    <div id="gestion-usuarios" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <button class="btn btn-primary mb-20" onclick="mostrarFormularioUsuario()">
+            <i class="fas fa-plus"></i> Nuevo Usuario
+        </button>
+        
+        <div id="formulario-usuario" class="hidden mb-20">
+            <input type="hidden" id="usuario-id">
+            <div class="form-group">
+                <label for="nombre-usuario">Nombre:</label>
+                <input type="text" id="nombre-usuario" placeholder="Nombre del usuario">
+            </div>
+            
+            <div class="form-group">
+                <label for="apellido-usuario">Apellido:</label>
+                <input type="text" id="apellido-usuario" placeholder="Apellido del usuario">
+            </div>
+            
+            <div class="form-group">
+                <label for="username-usuario">Usuario:</label>
+                <input type="text" id="username-usuario" placeholder="Nombre de usuario para login">
+            </div>
+            
+            <div class="form-group">
+                <label for="contrasena-usuario">Contraseña:</label>
+                <input type="password" id="contrasena-usuario" placeholder="Contraseña">
+                <small id="contrasena-info" class="text-muted">Dejar en blanco para mantener la actual (sólo en edición)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="rol-usuario">Rol:</label>
+                <select id="rol-usuario">
+                    <option value="Usuario">Usuario</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Admin">Administrador</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="email-usuario">Email:</label>
+                <input type="email" id="email-usuario" placeholder="correo@ejemplo.com">
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="guardarUsuario()">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <button class="btn btn-danger" onclick="cancelarEdicionUsuario()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="tabla-usuarios">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Email</th>
+                        <th>Último Acceso</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usuarios-tbody">
+                    <!-- Los usuarios se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        <div id="usuarios-loader" class="loader hidden"></div>
+    </div>
+
+    <!-- Sección de Reportes -->
+    <div id="reportes" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-chart-bar"></i> Reportes</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <ul class="nav nav-tabs mb-20">
+            <li class="nav-item">
+                <a class="nav-link active" onclick="mostrarTabReporte('avances')">Avances</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="mostrarTabReporte('inventario')">Inventario</a>
+            </li>
+        </ul>
+        
+        <!-- Pestaña de Reporte de Avances -->
+        <div id="reporte-avances" class="tab-content">
+            <div class="filters">
+                <div class="form-group">
+                    <label for="reporte-obra">Obra:</label>
+                    <select id="reporte-obra">
+                        <option value="">Todas las obras</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reporte-fecha-desde">Desde:</label>
+                    <input type="date" id="reporte-fecha-desde">
+                </div>
+                
+                <div class="form-group">
+                    <label for="reporte-fecha-hasta">Hasta:</label>
+                    <input type="date" id="reporte-fecha-hasta">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary mb-20" onclick="generarReporteAvances()">
+                <i class="fas fa-chart-line"></i> Generar Reporte
+            </button>
+            
+            <button class="btn btn-secondary mb-20" onclick="exportarReporteAvances()">
+                <i class="fas fa-file-export"></i> Exportar a CSV
+            </button>
+            
+            <button class="btn btn-warning mb-20" onclick="enviarReporteAvancesPorCorreo()">
+                <i class="fas fa-envelope"></i> Enviar por Correo
+            </button>
+            
+            <div id="reporte-avances-result" class="mt-20">
+                <!-- El resultado del reporte se mostrará aquí -->
+            </div>
+        </div>
+        
+        <!-- Pestaña de Reporte de Inventario -->
+        <div id="reporte-inventario" class="tab-content hidden">
+            <div class="filters">
+                <div class="form-group">
+                    <label for="reporte-categoria">Categoría:</label>
+                    <select id="reporte-categoria">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reporte-stock-bajo">
+                        <input type="checkbox" id="reporte-stock-bajo"> Incluir solo stock bajo
+                    </label>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary mb-20" onclick="generarReporteInventario()">
+                <i class="fas fa-chart-bar"></i> Generar Reporte
+            </button>
+            
+            <button class="btn btn-secondary mb-20" onclick="exportarReporteInventario()">
+                <i class="fas fa-file-export"></i> Exportar a CSV
+            </button>
+            
+            <button class="btn btn-warning mb-20" onclick="enviarReporteInventarioPorCorreo()">
+                <i class="fas fa-envelope"></i> Enviar por Correo
+            </button>
+            
+            <div id="reporte-inventario-result" class="mt-20">
+                <!-- El resultado del reporte se mostrará aquí -->
+            </div>
+        </div>
+    </div>
+    <!-- Sección de Configuración -->
+    <div id="configuracion" class="container hidden fade-in">
+        <div class="header">
+            <div>
+                <h2><i class="fas fa-cog"></i> Configuración</h2>
+            </div>
+            <button class="btn btn-danger" onclick="volverAlMenu()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        
+        <ul class="nav nav-tabs mb-20">
+            <li class="nav-item">
+                <a class="nav-link active" onclick="mostrarTabConfiguracion('general')">General</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="mostrarTabConfiguracion('notificaciones')">Notificaciones</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="mostrarTabConfiguracion('backup')">Backup</a>
+            </li>
+        </ul>
+        
+        <!-- Pestaña de Configuración General -->
+        <div id="config-general" class="tab-content">
+            <div class="form-group">
+                <label for="config-empresa">Nombre de la empresa:</label>
+                <input type="text" id="config-empresa" placeholder="Nombre de la empresa">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-color-primario">Color primario:</label>
+                <input type="color" id="config-color-primario" value="#3498db">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-color-secundario">Color secundario:</label>
+                <input type="color" id="config-color-secundario" value="#2ecc71">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-modo-oscuro">
+                    <input type="checkbox" id="config-modo-oscuro"> Activar modo oscuro
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-tiempo-sesion">Tiempo de sesión (minutos):</label>
+                <input type="number" id="config-tiempo-sesion" min="10" max="240" value="60">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-intentos-maximos">Intentos máximos de inicio de sesión:</label>
+                <input type="number" id="config-intentos-maximos" min="1" max="10" value="5">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-complejidad">Complejidad de contraseña:</label>
+                <select id="config-complejidad">
+                    <option value="baja">Baja (solo longitud)</option>
+                    <option value="media" selected>Media (letras y números)</option>
+                    <option value="alta">Alta (mayúsculas, minúsculas, números y símbolos)</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="guardarConfiguracionGeneral()">
+                <i class="fas fa-save"></i> Guardar Configuración
+            </button>
+        </div>
+        
+        <!-- Pestaña de Notificaciones -->
+        <div id="config-notificaciones" class="tab-content hidden">
+            <h3>Reportes Automáticos de Inventario</h3>
+            <div class="form-group">
+                <label for="config-reporte-inv-activo">
+                    <input type="checkbox" id="config-reporte-inv-activo"> Activar reportes automáticos
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-inv-frecuencia">Frecuencia:</label>
+                <select id="config-reporte-inv-frecuencia">
+                    <option value="diario">Diario</option>
+                    <option value="semanal" selected>Semanal</option>
+                    <option value="mensual">Mensual</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-inv-dia">Día de la semana:</label>
+                <select id="config-reporte-inv-dia">
+                    <option value="1">Lunes</option>
+                    <option value="2">Martes</option>
+                    <option value="3">Miércoles</option>
+                    <option value="4">Jueves</option>
+                    <option value="5">Viernes</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-inv-hora">Hora:</label>
+                <input type="number" id="config-reporte-inv-hora" min="0" max="23" value="8">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-inv-destinatarios">Destinatarios (separados por coma):</label>
+                <input type="text" id="config-reporte-inv-destinatarios" placeholder="correo1@ejemplo.com, correo2@ejemplo.com">
+            </div>
+            
+            <h3 class="mt-20">Reportes Automáticos de Avances</h3>
+            <div class="form-group">
+                <label for="config-reporte-avances-activo">
+                    <input type="checkbox" id="config-reporte-avances-activo"> Activar reportes automáticos
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-avances-frecuencia">Frecuencia:</label>
+                <select id="config-reporte-avances-frecuencia">
+                    <option value="diario">Diario</option>
+                    <option value="semanal" selected>Semanal</option>
+                    <option value="mensual">Mensual</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-avances-dia">Día de la semana:</label>
+                <select id="config-reporte-avances-dia">
+                    <option value="1">Lunes</option>
+                    <option value="2">Martes</option>
+                    <option value="3">Miércoles</option>
+                    <option value="4">Jueves</option>
+                    <option value="5">Viernes</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-avances-hora">Hora:</label>
+                <input type="number" id="config-reporte-avances-hora" min="0" max="23" value="16">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-reporte-avances-destinatarios">Destinatarios (separados por coma):</label>
+                <input type="text" id="config-reporte-avances-destinatarios" placeholder="correo1@ejemplo.com, correo2@ejemplo.com">
+            </div>
+            
+            <h3 class="mt-20">Alertas de Stock Bajo</h3>
+            <div class="form-group">
+                <label for="config-alerta-stock-activo">
+                    <input type="checkbox" id="config-alerta-stock-activo"> Activar alertas automáticas
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label for="config-alerta-stock-hora">Hora de verificación:</label>
+                <input type="number" id="config-alerta-stock-hora" min="0" max="23" value="9">
+            </div>
+            
+            <div class="form-group">
+                <label for="config-alerta-stock-destinatarios">Destinatarios (separados por coma):</label>
+                <input type="text" id="config-alerta-stock-destinatarios" placeholder="correo1@ejemplo.com, correo2@ejemplo.com">
+            </div>
+            
+            <button class="btn btn-primary" onclick="guardarConfiguracionNotificaciones()">
+                <i class="fas fa-save"></i> Guardar Configuración
+            </button>
+        </div>
+        
+        <!-- Pestaña de Backup -->
+        <div id="config-backup" class="tab-content hidden">
+            <h3>Backup de la Base de Datos</h3>
+            <p>Genera un backup completo de todos los datos del sistema para respaldo.</p>
+            
+            <button class="btn btn-primary" onclick="generarBackupCompleto()">
+                <i class="fas fa-download"></i> Generar Backup Completo
+            </button>
+            
+            <div id="backup-result" class="mt-20 hidden">
+                <div class="alert alert-success">
+                    Backup generado correctamente. 
+                    <a href="#" id="backup-link" target="_blank">Descargar archivo</a>
+                </div>
+            </div>
+            
+            <h3 class="mt-20">Exportar Datos</h3>
+            <div class="form-group">
+                <label for="exportar-tipo">Seleccione el tipo de datos a exportar:</label>
+                <select id="exportar-tipo">
+                    <option value="obras">Obras</option>
+                    <option value="avances">Avances</option>
+                    <option value="inventario">Inventario</option>
+                    <option value="movimientos">Movimientos de Inventario</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="exportarDatos()">
+                <i class="fas fa-file-export"></i> Exportar a CSV
+            </button>
+            
+            <div id="exportar-result" class="mt-20 hidden">
+                <div class="alert alert-success">
+                    Datos exportados correctamente. 
+                    <a href="#" id="exportar-link" target="_blank">Descargar archivo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para cambiar contraseña -->
+    <div id="modal-cambiar-contrasena" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; border-radius: var(--border-radius); max-width: 500px; width: 90%; padding: 20px; box-shadow: var(--box-shadow);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0;"><i class="fas fa-key"></i> Cambiar Contraseña</h3>
+                <button onclick="cerrarModalContrasena()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="contrasena-actual">Contraseña actual:</label>
+                <input type="password" id="contrasena-actual" placeholder="Ingrese su contraseña actual">
+            </div>
+            
+            <div class="form-group">
+                <label for="contrasena-nueva">Nueva contraseña:</label>
+                <input type="password" id="contrasena-nueva" placeholder="Ingrese su nueva contraseña">
+            </div>
+            
+            <div class="form-group">
+                <label for="contrasena-confirmar">Confirmar nueva contraseña:</label>
+                <input type="password" id="contrasena-confirmar" placeholder="Confirme su nueva contraseña">
+            </div>
+            
+            <div id="cambiar-contrasena-error" class="text-danger hidden"></div>
+            
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-danger" onclick="cerrarModalContrasena()">Cancelar</button>
+                <button class="btn btn-primary" onclick="cambiarContrasena()">Guardar</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Variables globales
+        let usuarioActual = null;
+        let tokenSesion = null;
+        let obrasData = [];
+        let tiposAvanceData = [];
+        let materialesData = [];
+        let categoriasData = [];
+        let usuariosData = [];
+        let paginaActual = 1;
+        
+        // Función para llamar a la API
+        async function callAPI(accion, datos = {}) {
+            try {
+                // Mostrar loader
+                document.getElementById('login-loader').classList.remove('hidden');
+                
+                const response = await new Promise((resolve, reject) => {
+                    google.script.run
+                        .withSuccessHandler(resolve)
+                        .withFailureHandler(reject)
+                        .procesarAPI(accion, datos, tokenSesion);
+                });
+                
+                // Ocultar loader
+                document.getElementById('login-loader').classList.add('hidden');
+                
+                return response;
+            } catch (error) {
+                // Ocultar loader y mostrar error
+                document.getElementById('login-loader').classList.add('hidden');
+                console.error("Error en API:", error);
+                mostrarNotificacion("Error de conexión. Intente nuevamente.", "error");
+                throw error;
+            }
+        }
+        
+        // Función para iniciar sesión
+        async function iniciarSesion() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        mostrarNotificacion("Por favor, complete todos los campos.", "error");
+        return;
+    }
+
+    try {
+        const response = await callAPI('iniciarSesion', { username, password });
+
+        if (!response.success) {
+            mostrarNotificacion(response.message, "error");
+            return;
+        }
+
+        // Guardar datos de sesión
+        usuarioActual = response.usuario;
+        tokenSesion = response.token;
+
+        // Actualizar interfaz
+        document.getElementById('current-user').textContent = usuarioActual.nombre;
+        document.getElementById('current-role').textContent = usuarioActual.rol;
+
+        // Mostrar/ocultar elementos según el rol
+        if (usuarioActual.rol !== 'Admin') {
+            document.getElementById('gestion-usuarios-btn').style.display = 'none';
+            document.getElementById('configuracion-btn').style.display = 'none';
+        }
+
+        // Mostrar menú principal
+        document.getElementById('login-container').classList.add('hidden');
+        document.getElementById('main-menu-container').classList.remove('hidden');
+
+        // Cargar datos iniciales
+        await Promise.all([
+            cargarObras(),
+            cargarTiposAvance(),
+            cargarCategorias()
+        ]);
+
+        // Mostrar notificación
+        mostrarNotificacion("Sesión iniciada correctamente.", "success");
+
+        // Mostrar modal de cambio de contraseña SOLO si el backend lo solicita
+        if (usuarioActual.requiereCambioContrasena) {
+            mostrarModalContrasena();
+        } else {
+            cerrarModalContrasena(); // Por si quedó abierto
+        }
+
+    } catch (error) {
+        mostrarNotificacion("Error al iniciar sesión.", "error");
+    }
+}
+        // Función para cerrar sesión
+        async function cerrarSesion() {
+            try {
+                await callAPI('cerrarSesion');
+                
+                // Reiniciar variables
+                usuarioActual = null;
+                tokenSesion = null;
+                
+                // Volver a pantalla de login
+                document.getElementById('main-menu-container').classList.add('hidden');
+                document.getElementById('login-container').classList.remove('hidden');
+                
+                // Limpiar campos
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                
+                // Ocultar todas las secciones
+                const secciones = document.querySelectorAll('.container:not(#login-container)');
+                secciones.forEach(seccion => seccion.classList.add('hidden'));
+                
+                mostrarNotificacion("Sesión cerrada correctamente.", "success");
+            } catch (error) {
+                mostrarNotificacion("Error al cerrar sesión.", "error");
+            }
+        }
+        
+        // Función para mostrar secciones
+        function mostrarSeccion(seccion) {
+            // Ocultar todas las secciones
+            const secciones = document.querySelectorAll('.container');
+            secciones.forEach(s => s.classList.add('hidden'));
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(seccion).classList.remove('hidden');
+            
+            // Ejecutar carga de datos según la sección
+            switch(seccion) {
+                case 'registrar-avance':
+                    cargarObras();
+                    break;
+                case 'consultar-avances':
+                    cargarObras();
+                    filtrarAvances();
+                    break;
+                case 'gestion-obras':
+                    cargarObras();
+                    cargarTiposAvance();
+                    break;
+                case 'gestion-avances':
+                    cargarTiposAvance();
+                    break;
+                case 'gestion-inventario':
+                    cargarCategorias();
+                    cargarMateriales();
+                    mostrarTabInventario('consultar');
+                    break;
+                case 'gestion-usuarios':
+                    cargarUsuarios();
+                    break;
+                case 'reportes':
+                    cargarObras();
+                    cargarCategorias();
+                    mostrarTabReporte('avances');
+                    break;
+                case 'configuracion':
+                    cargarConfiguracion();
+                    mostrarTabConfiguracion('general');
+                    break;
+            }
+        }
+        
+        // Función para volver al menú principal
+        function volverAlMenu() {
+            // Ocultar todas las secciones
+            const secciones = document.querySelectorAll('.container');
+            secciones.forEach(s => s.classList.add('hidden'));
+            
+            // Mostrar el menú principal
+            document.getElementById('main-menu-container').classList.remove('hidden');
+        }
+        
+        // Función para cargar obras
+        async function cargarObras() {
+            try {
+                const response = await callAPI('obtenerObras');
+                if (response.error) {
+                    mostrarNotificacion("Error al cargar las obras.", "error");
+                    return;
+                }
+                
+                obrasData = response.datos;
+                
+                // Actualizar selectores de obras
+                const selectores = [
+                    'obra-avance',
+                    'filtro-obra',
+                    'destino-salida',
+                    'reporte-obra'
+                ];
+                
+                selectores.forEach(selector => {
+                    const select = document.getElementById(selector);
+                    if (!select) return;
+                    
+                    // Mantener primera opción
+                    const primeraOpcion = select.options[0];
+                    select.innerHTML = '';
+                    select.appendChild(primeraOpcion);
+                    
+                    // Agregar obras
+                    obrasData.forEach(obra => {
+                        const option = document.createElement('option');
+                        option.value = obra.id;
+                        option.textContent = obra.nombre;
+                        select.appendChild(option);
+                    });
+                });
+                
+                // Actualizar tabla de obras si está visible
+                if (!document.getElementById('gestion-obras').classList.contains('hidden')) {
+                    const tbody = document.getElementById('obras-tbody');
+                    tbody.innerHTML = '';
+                    
+                    obrasData.forEach(obra => {
+                        const tr = document.createElement('tr');
+                        
+                        // Aplicar clase según el estado
+                        if (obra.estado === 'Finalizada') {
+                            tr.classList.add('bg-success');
+                        } else if (obra.estado === 'Suspendida') {
+                            tr.classList.add('bg-warning');
+                        }
+                        
+                        tr.innerHTML = `
+                            <td>${obra.nombre}</td>
+                            <td>${obra.direccion || '-'}</td>
+                            <td>${obra.fechaInicio ? new Date(obra.fechaInicio).toLocaleDateString() : '-'}</td>
+                            <td>${obra.fechaTermino ? new Date(obra.fechaTermino).toLocaleDateString() : '-'}</td>
+                            <td><span class="badge badge-${obra.estado === 'Finalizada' ? 'secondary' : 
+                                obra.estado === 'En progreso' ? 'primary' : 
+                                obra.estado === 'Suspendida' ? 'danger' : 'warning'}">${obra.estado}</span></td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-${
+                                        obra.avanceGeneral >= 75 ? 'success' : 
+                                        obra.avanceGeneral >= 50 ? 'primary' : 
+                                        obra.avanceGeneral >= 25 ? 'warning' : 'danger'
+                                    }" 
+                                    style="width: ${obra.avanceGeneral}%;">${obra.avanceGeneral}%</div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="editarObra('${obra.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarObra('${obra.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                mostrarNotificacion("Error al cargar las obras.", "error");
+            }
+        }
+        
+        // Función para cargar tipos de avance
+        async function cargarTiposAvance() {
+            try {
+                const response = await callAPI('obtenerTiposAvance');
+                if (response.error) {
+                    mostrarNotificacion("Error al cargar los tipos de avance.", "error");
+                    return;
+                }
+                
+                tiposAvanceData = response.datos;
+                
+                // Actualizar selector de avances asociados
+                const selectorAvances = document.getElementById('avances-obra');
+                if (selectorAvances) {
+                    selectorAvances.innerHTML = '';
+                    
+                    tiposAvanceData.forEach(tipo => {
+                        const option = document.createElement('option');
+                        option.value = tipo.id;
+                        option.textContent = tipo.nombre;
+                        selectorAvances.appendChild(option);
+                    });
+                }
+                
+                // Actualizar tabla de tipos de avance si está visible
+                if (!document.getElementById('gestion-avances').classList.contains('hidden')) {
+                    const tbody = document.getElementById('tipos-avance-tbody');
+                    tbody.innerHTML = '';
+                    
+                    tiposAvanceData.forEach(tipo => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${tipo.nombre}</td>
+                            <td>${tipo.descripcion}</td>
+                            <td>${tipo.categoria}</td>
+                            <td>
+                                <div style="width: 20px; height: 20px; background-color: ${tipo.color}; border-radius: 3px;"></div>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="editarTipoAvance('${tipo.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarTipoAvance('${tipo.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                mostrarNotificacion("Error al cargar los tipos de avance.", "error");
+            }
+        }
+         // Función para cargar categorías
+         async function cargarCategorias() {
+            try {
+                const response = await callAPI('obtenerCategorias');
+                if (response.error) {
+                    mostrarNotificacion("Error al cargar las categorías.", "error");
+                    return;
+                }
+                
+                categoriasData = response.datos;
+                
+                // Actualizar selectores de categorías
+                const selectores = [
+                    'filtro-categoria',
+                    'categoria-material',
+                    'reporte-categoria'
+                ];
+                
+                selectores.forEach(selector => {
+                    const select = document.getElementById(selector);
+                    if (!select) return;
+                    
+                    // Mantener primera opción
+                    const primeraOpcion = select.options[0];
+                    select.innerHTML = '';
+                    select.appendChild(primeraOpcion);
+                    
+                    // Agregar categorías
+                    categoriasData.forEach(categoria => {
+                        const option = document.createElement('option');
+                        option.value = categoria.id;
+                        option.textContent = categoria.nombre;
+                        select.appendChild(option);
+                    });
+                });
+                
+                // Actualizar tabla de categorías si está visible
+                if (!document.getElementById('inventario-categorias').classList.contains('hidden')) {
+                    const tbody = document.getElementById('categorias-tbody');
+                    tbody.innerHTML = '';
+                    
+                    categoriasData.forEach(categoria => {
+                        const tr = document.createElement('tr');
+                        
+                        // Contar materiales por categoría
+                        const cantidadMateriales = materialesData.filter(m => m.categoriaId == categoria.id).length;
+                        
+                        tr.innerHTML = `
+                            <td>${categoria.nombre}</td>
+                            <td>${categoria.descripcion}</td>
+                            <td>
+                                <div style="width: 20px; height: 20px; background-color: ${categoria.color}; border-radius: 3px;"></div>
+                            </td>
+                            <td>${cantidadMateriales}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="editarCategoria('${categoria.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarCategoria('${categoria.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                mostrarNotificacion("Error al cargar las categorías.", "error");
+            }
+        }
+        
+        // Función para cargar materiales
+        async function cargarMateriales(filtros = {}) {
+            try {
+                const response = await callAPI('obtenerMateriales', { filtros });
+                if (response.error) {
+                    mostrarNotificacion("Error al cargar los materiales.", "error");
+                    return;
+                }
+                
+                materialesData = response.datos;
+                
+                // Actualizar selectores de materiales
+                const selectores = [
+                    'material-entrada',
+                    'material-salida',
+                    'filtro-material-movimiento'
+                ];
+                
+                selectores.forEach(selector => {
+                    const select = document.getElementById(selector);
+                    if (!select) return;
+                    
+                    // Mantener primera opción
+                    const primeraOpcion = select.options[0];
+                    select.innerHTML = '';
+                    select.appendChild(primeraOpcion);
+                    
+                    // Agregar materiales
+                    materialesData.forEach(material => {
+                        const option = document.createElement('option');
+                        option.value = material.id;
+                        option.textContent = `${material.codigo} - ${material.nombre}`;
+                        select.appendChild(option);
+                    });
+                });
+                
+                // Actualizar tabla de inventario si está visible
+                if (!document.getElementById('inventario-consultar').classList.contains('hidden')) {
+                    const tbody = document.getElementById('inventario-tbody');
+                    tbody.innerHTML = '';
+                    
+                    materialesData.forEach(material => {
+                        const tr = document.createElement('tr');
+                        
+                        // Aplicar clase según el stock
+                        if (material.stock <= 0) {
+                            tr.classList.add('stock-zero');
+                        } else if (material.stock <= material.stockMinimo) {
+                            tr.classList.add('stock-low');
+                        } else {
+                            tr.classList.add('stock-ok');
+                        }
+                        
+                        tr.innerHTML = `
+                            <td>${material.codigo}</td>
+                            <td>${material.nombre}</td>
+                            <td>${material.descripcion}</td>
+                            <td>
+                                <span class="badge" style="background-color: ${material.categoriaColor}">
+                                    ${material.categoriaNombre}
+                                </span>
+                            </td>
+                            <td class="${material.stock <= material.stockMinimo ? 'text-danger' : ''}">${material.stock}</td>
+                            <td>${material.stockMinimo}</td>
+                            <td>${material.unidad}</td>
+                            <td>${material.ubicacion}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="editarMaterial('${material.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarMaterial('${material.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn btn-sm btn-success" onclick="mostrarEntradaRapida('${material.id}')">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="mostrarSalidaRapida('${material.id}')">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                mostrarNotificacion("Error al cargar los materiales.", "error");
+            }
+        }
+        
+        // Función para cargar usuarios
+        async function cargarUsuarios() {
+            try {
+                const response = await callAPI('obtenerUsuarios');
+                if (response.error) {
+                    mostrarNotificacion("Error al cargar los usuarios.", "error");
+                    return;
+                }
+                
+                usuariosData = response.datos;
+                
+                // Actualizar tabla de usuarios
+                const tbody = document.getElementById('usuarios-tbody');
+                tbody.innerHTML = '';
+                
+                usuariosData.forEach(usuario => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${usuario.nombre} ${usuario.apellido}</td>
+                        <td>${usuario.usuario}</td>
+                        <td><span class="badge badge-${
+                            usuario.rol === 'Admin' ? 'danger' : 
+                            usuario.rol === 'Supervisor' ? 'warning' : 'primary'
+                        }">${usuario.rol}</span></td>
+                        <td>${usuario.email}</td>
+                        <td>${usuario.ultimoAcceso ? new Date(usuario.ultimoAcceso).toLocaleString() : 'Nunca'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editarUsuario('${usuario.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="eliminarUsuario('${usuario.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                mostrarNotificacion("Error al cargar los usuarios.", "error");
+            }
+        }
+        
+        // Función para cargar movimientos de inventario
+        async function cargarMovimientosInventario(filtros = {}) {
+            try {
+                const response = await callAPI('obtenerMovimientosInventario', { filtros });
+                if (response.error) {
+                    mostrarNotificacion("Error al cargar los movimientos.", "error");
+                    return;
+                }
+                
+                const movimientos = response.datos;
+                
+                // Actualizar tabla de movimientos
+                const tbody = document.getElementById('movimientos-tbody');
+                tbody.innerHTML = '';
+                
+                movimientos.forEach(movimiento => {
+                    const tr = document.createElement('tr');
+                    
+                    // Aplicar clase según el tipo de movimiento
+                    if (movimiento.tipoMovimiento === 'entrada') {
+                        tr.classList.add('bg-success');
+                    } else if (movimiento.tipoMovimiento === 'salida') {
+                        tr.classList.add('bg-warning');
+                    } else {
+                        tr.classList.add('bg-info');
+                    }
+                    
+                    tr.innerHTML = `
+                        <td>${new Date(movimiento.fecha).toLocaleString()}</td>
+                        <td>
+                            <span class="badge badge-${
+                                movimiento.tipoMovimiento === 'entrada' ? 'success' : 
+                                movimiento.tipoMovimiento === 'salida' ? 'warning' : 'info'
+                            }">
+                                ${movimiento.tipoMovimiento.toUpperCase()}
+                            </span>
+                        </td>
+                        <td>${movimiento.materialNombre}</td>
+                        <td>${movimiento.cantidad} ${movimiento.unidad}</td>
+                        <td>${movimiento.origenDestino || '-'}</td>
+                        <td>${movimiento.usuarioNombre}</td>
+                        <td>${movimiento.comentario || '-'}</td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                mostrarNotificacion("Error al cargar los movimientos.", "error");
+            }
+        }
+        
+        // Función para cargar avances
+        async function cargarAvancesObra() {
+            const obraId = document.getElementById('obra-avance').value;
+            
+            if (!obraId) {
+                document.getElementById('avances-especificos').innerHTML = '<p>Seleccione una obra para ver los avances disponibles.</p>';
+                return;
+            }
+            
+            try {
+                // Obtener los tipos de avance de la obra
+                const obra = obrasData.find(o => o.id == obraId);
+                const tiposAvanceIds = obra.avancesAsociados;
+                
+                const avancesContainer = document.getElementById('avances-especificos');
+                avancesContainer.innerHTML = '';
+                
+                if (!tiposAvanceIds || tiposAvanceIds.length === 0) {
+                    avancesContainer.innerHTML = '<p>Esta obra no tiene tipos de avance asociados.</p>';
+                    return;
+                }
+                
+                // Crear checkboxes para cada tipo de avance
+                tiposAvanceIds.forEach(id => {
+                    const tipoAvance = tiposAvanceData.find(t => t.id == id);
+                    if (!tipoAvance) return;
+                    
+                    const avanceItem = document.createElement('div');
+                    avanceItem.className = 'avance-item';
+                    
+                    avanceItem.innerHTML = `
+                        <label>
+                            <input type="checkbox" name="avance" value="${tipoAvance.id}">
+                            ${tipoAvance.nombre}
+                        </label>
+                        <p style="margin: 5px 0 0 28px; color: var(--gray-color); font-size: 14px;">
+                            ${tipoAvance.descripcion}
+                        </p>
+                    `;
+                    
+                    avancesContainer.appendChild(avanceItem);
+                });
+            } catch (error) {
+                mostrarNotificacion("Error al cargar los avances de la obra.", "error");
+            }
+        }
+        
+        // Función para registrar un avance
+        async function registrarAvance() {
+            const obraId = document.getElementById('obra-avance').value;
+            const piso = document.getElementById('piso').value;
+            const departamento = document.getElementById('departamento').value;
+            const observaciones = document.getElementById('observaciones').value;
+            
+            // Validar campos requeridos
+            if (!obraId || !piso || !departamento) {
+                mostrarNotificacion("Por favor complete todos los campos requeridos.", "error");
+                return;
+            }
+            
+            // Obtener avances seleccionados
+            const avancesChecks = document.querySelectorAll('#avances-especificos input[type="checkbox"]:checked');
+            if (avancesChecks.length === 0) {
+                mostrarNotificacion("Debe seleccionar al menos un avance.", "error");
+                return;
+            }
+            
+            // Construir objeto de avances
+            const avancesRealizados = {};
+            avancesChecks.forEach(check => {
+                avancesRealizados[check.value] = {
+                    completado: true,
+                    fecha: new Date().toISOString()
+                };
+            });
+            
+            // Crear objeto de avance
+            const avance = {
+                obraId,
+                piso,
+                departamento,
+                avancesRealizados,
+                observaciones
+            };
+            
+            try {
+                // Mostrar loader
+                document.getElementById('avance-loader').classList.remove('hidden');
+                
+                const response = await callAPI('registrarAvance', avance);
+                
+                // Ocultar loader
+                document.getElementById('avance-loader').classList.add('hidden');
+                
+                if (response.success) {
+                    mostrarNotificacion("Avance registrado correctamente.", "success");
+                    
+                    // Limpiar formulario
+                    document.getElementById('piso').value = '';
+                    document.getElementById('departamento').value = '';
+                    document.getElementById('observaciones').value = '';
+                    
+                    // Desmarcar checkboxes
+                    document.querySelectorAll('#avances-especificos input[type="checkbox"]').forEach(check => {
+                        check.checked = false;
+                    });
+                } else {
+                    mostrarNotificacion(response.message || "Error al registrar el avance.", "error");
+                }
+            } catch (error) {
+                document.getElementById('avance-loader').classList.add('hidden');
+                mostrarNotificacion("Error al registrar el avance.", "error");
+            }
+        }
+        
+        // Función para filtrar avances
+        async function filtrarAvances() {
+            const obraId = document.getElementById('filtro-obra').value;
+            const piso = document.getElementById('filtro-piso').value;
+            const departamento = document.getElementById('filtro-depto').value;
+            const fecha = document.getElementById('filtro-fecha').value;
+            
+            const filtros = {};
+            if (obraId) filtros.obraId = obraId;
+            if (piso) filtros.piso = piso;
+            if (departamento) filtros.departamento = departamento;
+            if (fecha) filtros.fecha = fecha;
+            
+            try {
+                // Mostrar loader
+                document.getElementById('consulta-loader').classList.remove('hidden');
+                
+                const response = await callAPI('obtenerAvances', { filtros });
+                
+                // Ocultar loader
+                document.getElementById('consulta-loader').classList.add('hidden');
+                
+                if (response.error) {
+                    mostrarNotificacion("Error al obtener los avances.", "error");
+                    return;
+                }
+                
+                const avances = response.datos;
+                
+                // Actualizar tabla de avances
+                const tbody = document.getElementById('avances-tbody');
+                tbody.innerHTML = '';
+                
+                if (avances.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No se encontraron avances con los filtros seleccionados.</td></tr>';
+                    return;
+                }
+                
+                avances.forEach(avance => {
+                    const tr = document.createElement('tr');
+                    
+                    // Preparar lista de avances realizados
+                    let avancesHtml = '<ul style="margin: 0; padding-left: 20px;">';
+                    for (const tipoId in avance.avancesRealizados) {
+                        const tipoAvance = tiposAvanceData.find(t => t.id == tipoId);
+                        if (tipoAvance) {
+                            avancesHtml += `<li>${tipoAvance.nombre}</li>`;
+                        }
+                    }
+                    avancesHtml += '</ul>';
+                    
+                    tr.innerHTML = `
+                        <td>${avance.obraNombre}</td>
+                        <td>${avance.piso}</td>
+                        <td>${avance.departamento}</td>
+                        <td>${avancesHtml}</td>
+                        <td>${new Date(avance.fechaRegistro).toLocaleString()}</td>
+                        <td>${avance.registradoPorNombre}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="verDetalleAvance('${avance.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                document.getElementById('consulta-loader').classList.add('hidden');
+                mostrarNotificacion("Error al consultar los avances.", "error");
+            }
+        }
+        
+        // Función para limpiar filtros de avances
+        function limpiarFiltrosAvances() {
+            document.getElementById('filtro-obra').value = '';
+            document.getElementById('filtro-piso').value = '';
+            document.getElementById('filtro-depto').value = '';
+            document.getElementById('filtro-fecha').value = '';
+            
+            filtrarAvances();
+        }
+        
+        // Función para mostrar tabla de inventario
+        function mostrarTabInventario(tab) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('#gestion-inventario .tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Desactivar todas las pestañas
+            document.querySelectorAll('#gestion-inventario .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Mostrar la pestaña seleccionada
+            document.getElementById('inventario-' + tab).classList.remove('hidden');
+            
+            // Activar la pestaña seleccionada
+            document.querySelector(`#gestion-inventario .nav-link[onclick="mostrarTabInventario('${tab}')"]`).classList.add('active');
+            
+            // Cargar datos según la pestaña
+            switch (tab) {
+                case 'consultar':
+                    cargarMateriales();
+                    break;
+                case 'entradas':
+                    cargarMateriales();
+                    break;
+                case 'salidas':
+                    cargarMateriales();
+                    cargarObras();
+                    break;
+                case 'movimientos':
+                    cargarMovimientosInventario();
+                    cargarMateriales();
+                    break;
+                case 'categorias':
+                    cargarCategorias();
+                    break;
+            }
+        }
+        
+        // Función para mostrar notificación
+        function mostrarNotificacion(mensaje, tipo) {
+            // Crear elemento de notificación
+            const notificacion = document.createElement('div');
+            notificacion.className = `notification ${tipo}`;
+            notificacion.textContent = mensaje;
+            
+            // Agregar al DOM
+            document.body.appendChild(notificacion);
+            
+            // Eliminar después de 4 segundos
+            setTimeout(() => {
+                if (notificacion.parentNode) {
+                    notificacion.parentNode.removeChild(notificacion);
+                }
+            }, 4000);
+        }
+        
+        // Función para cambiar contraseña
+        async function cambiarContrasena() {
+            const contrasenaActual = document.getElementById('contrasena-actual').value;
+            const nuevaContrasena = document.getElementById('contrasena-nueva').value;
+            const confirmarContrasena = document.getElementById('contrasena-confirmar').value;
+            
+            // Validar que las contraseñas coincidan
+            if (nuevaContrasena !== confirmarContrasena) {
+                document.getElementById('cambiar-contrasena-error').textContent = 'Las contraseñas no coinciden';
+                document.getElementById('cambiar-contrasena-error').classList.remove('hidden');
+                return;
+            }
+            
+            // Validar longitud mínima
+            if (nuevaContrasena.length < 8) {
+                document.getElementById('cambiar-contrasena-error').textContent = 'La contraseña debe tener al menos 8 caracteres';
+                document.getElementById('cambiar-contrasena-error').classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                const response = await callAPI('cambiarContrasena', {
+                    contrasenaActual: contrasenaActual,
+                    nuevaContrasena: nuevaContrasena
+                });
+                
+                if (response.success) {
+                    mostrarNotificacion("Contraseña cambiada correctamente.", "success");
+                    cerrarModalContrasena();
+                } else {
+                    document.getElementById('cambiar-contrasena-error').textContent = response.message;
+                    document.getElementById('cambiar-contrasena-error').classList.remove('hidden');
+                }
+            } catch (error) {
+                document.getElementById('cambiar-contrasena-error').textContent = 'Error al cambiar la contraseña';
+                document.getElementById('cambiar-contrasena-error').classList.remove('hidden');
+            }
+        }
+        
+        // Funciones para modal de cambio de contraseña
+        function mostrarModalContrasena() {
+            document.getElementById('modal-cambiar-contrasena').classList.remove('hidden');
+            document.getElementById('contrasena-actual').value = '';
+            document.getElementById('contrasena-nueva').value = '';
+            document.getElementById('contrasena-confirmar').value = '';
+            document.getElementById('cambiar-contrasena-error').classList.add('hidden');
+        }
+        
+        function cerrarModalContrasena() {
+            document.getElementById('modal-cambiar-contrasena').classList.add('hidden');
+        }
+        
+        // Asignar eventos iniciales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar evento al botón de cambiar contraseña
+            document.getElementById('cambiarContrasenaBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                mostrarModalContrasena();
+            });
+        });
+    </script>
+</body>
+</html>
