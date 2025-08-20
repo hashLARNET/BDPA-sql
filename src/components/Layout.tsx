@@ -9,15 +9,18 @@ import {
   Wifi, 
   WifiOff,
   User,
-  LogOut
+  LogOut,
+  RefreshCw
 } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { useSyncStore } from '../store/sync.store';
+import SyncStatus from './sync/SyncStatus';
 
 const Layout: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuthStore();
-  const { isOnline, isSyncing, queue } = useSyncStore();
+  const { isOnline, isSyncing, queue, processQueue } = useSyncStore();
+  const [showSyncStatus, setShowSyncStatus] = useState(false);
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home },
@@ -130,9 +133,25 @@ const Layout: React.FC = () => {
               {/* Sync Indicator */}
               {isSyncing && (
                 <div className="flex items-center space-x-2 text-sm text-primary-600">
-                  <div className="animate-spin h-4 w-4 border border-primary-500 border-t-transparent rounded-full" />
+                <button
+                  onClick={() => setShowSyncStatus(true)}
+                  className="text-xs bg-warning-100 text-warning-700 px-2 py-1 rounded-full hover:bg-warning-200 transition-colors"
+                  title="Ver cola de sincronización"
+              
+              {/* Quick Sync Button */}
+              {isOnline && !isSyncing && queue.length > 0 && (
+                <button
+                  onClick={processQueue}
+                  className="flex items-center space-x-2 text-sm text-primary-600 hover:text-primary-700 transition-colors"
+                  title="Sincronizar ahora"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span>Sincronizar ({queue.length})</span>
+                </button>
+              )}
+                >
                   <span>Sincronizando...</span>
-                </div>
+                </button>
               )}
             </div>
           </div>
@@ -143,6 +162,26 @@ const Layout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+      
+      {/* Sync Status Modal */}
+      {showSyncStatus && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Estado de Sincronización</h2>
+              <button
+                onClick={() => setShowSyncStatus(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6">
+              <SyncStatus />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

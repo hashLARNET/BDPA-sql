@@ -6,10 +6,8 @@ import LoginForm from './components/auth/LoginForm';
 import Dashboard from './components/dashboard/Dashboard';
 import AvanceList from './components/avances/AvanceList';
 import MedicionList from './components/mediciones/MedicionList';
-
-// Placeholder components
-const Reportes = () => <div className="p-6">Módulo de Reportes - En desarrollo</div>;
-const Configuracion = () => <div className="p-6">Módulo de Configuración - En desarrollo</div>;
+import ReportGenerator from './components/reportes/ReportGenerator';
+import ConfiguracionPanel from './components/configuracion/ConfiguracionPanel';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -49,8 +47,8 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="avances" element={<AvanceList />} />
             <Route path="mediciones" element={<MedicionList />} />
-            <Route path="reportes" element={<Reportes />} />
-            <Route path="configuracion" element={<Configuracion />} />
+            <Route path="reportes" element={<ReportGenerator />} />
+            <Route path="configuracion" element={<ConfiguracionPanel />} />
           </Route>
           
           {/* Catch all route */}
