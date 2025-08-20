@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -10,7 +10,8 @@ import {
   WifiOff,
   User,
   LogOut,
-  RefreshCw
+  RefreshCw,
+  X
 } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { useSyncStore } from '../store/sync.store';
@@ -133,10 +134,21 @@ const Layout: React.FC = () => {
               {/* Sync Indicator */}
               {isSyncing && (
                 <div className="flex items-center space-x-2 text-sm text-primary-600">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <span>Sincronizando...</span>
+                </div>
+              )}
+              
+              {/* Pending Sync Indicator */}
+              {pendingSync > 0 && (
                 <button
                   onClick={() => setShowSyncStatus(true)}
                   className="text-xs bg-warning-100 text-warning-700 px-2 py-1 rounded-full hover:bg-warning-200 transition-colors"
                   title="Ver cola de sincronización"
+                >
+                  {pendingSync} pendientes
+                </button>
+              )}
               
               {/* Quick Sync Button */}
               {isOnline && !isSyncing && queue.length > 0 && (
@@ -147,10 +159,6 @@ const Layout: React.FC = () => {
                 >
                   <RefreshCw className="h-4 w-4" />
                   <span>Sincronizar ({queue.length})</span>
-                </button>
-              )}
-                >
-                  <span>Sincronizando...</span>
                 </button>
               )}
             </div>
