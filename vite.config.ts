@@ -18,6 +18,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    manifest: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -44,5 +45,9 @@ export default defineConfig({
       'tailwind-merge',
       'lucide-react'
     ],
+  },
+  // PWA Configuration
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
   },
 });

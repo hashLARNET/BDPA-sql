@@ -8,6 +8,9 @@ import AvanceList from './components/avances/AvanceList';
 import MedicionList from './components/mediciones/MedicionList';
 import ReportGenerator from './components/reportes/ReportGenerator';
 import ConfiguracionPanel from './components/configuracion/ConfiguracionPanel';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+import PWAUpdatePrompt from './components/PWAUpdatePrompt';
+import OfflineIndicator from './components/OfflineIndicator';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -26,6 +29,11 @@ function App() {
   return (
     <Router>
       <div className="App">
+        {/* PWA Components */}
+        <PWAInstallPrompt />
+        <PWAUpdatePrompt />
+        <OfflineIndicator />
+        
         <Routes>
           {/* Public Routes */}
           <Route 
