@@ -66,47 +66,60 @@ class AuthService:
     async def authenticate_user(username: str, password: str) -> Optional[Usuario]:
         """Autenticar usuario"""
         try:
-            # Buscar usuario por username
-            response = supabase_client.table('usuarios').select('*').eq('username', username).eq('activo', True).execute()
+            # Usar función de autenticación de Supabase que maneja contraseñas hasheadas
+            response = supabase_client.rpc('authenticate_user', {
+                'username_param': username,
+                'password_param': password
+            }).execute()
             
-            if not response.data:
+            if not response.data or len(response.data) == 0:
                 return None
             
-            user_data = response.data[0]
+            auth_result = response.data[0]
             
-            # LIMITACIÓN CRÍTICA: El esquema actual de Supabase no incluye una columna 
-            # para contraseñas hasheadas en la tabla 'usuarios'. Para implementar 
-            # seguridad adecuada, se requiere:
-            # 1. Agregar columna 'password_hash' a la tabla usuarios
-            # 2. Migrar usuarios existentes con contraseñas hasheadas
-            # 3. Actualizar esta función para usar verify_password()
-            #
-            # Implementación temporal para desarrollo:
-            if 'password_hash' in user_data and user_data['password_hash']:
-                # Si existe hash en BD, usar verificación segura
-                if AuthService.verify_password(password, user_data['password_hash']):
-                    # Actualizar último acceso
-                    supabase_client.table('usuarios').update({
-                        'ultimo_acceso': datetime.utcnow().isoformat()
-                    }).eq('id', user_data['id']).execute()
-                    
-                    return Usuario(**user_data)
-            else:
-                # Fallback temporal para desarrollo (INSEGURO)
-                # TODO: ELIMINAR en producción una vez implementado el esquema de contraseñas
-                if password == "password123":
-                    # Actualizar último acceso
-                    supabase_client.table('usuarios').update({
-                        'ultimo_acceso': datetime.utcnow().isoformat()
-                    }).eq('id', user_data['id']).execute()
-                    
-                    return Usuario(**user_data)
+            # Verificar si la autenticación fue exitosa
+            if not auth_result.get('success', False):
+                print(f"Autenticación fallida: {auth_result.get('message', 'Error desconocido')}")
+                return None
             
-            return None
+            # Crear objeto Usuario con los datos retornados
+            user_data = {
+                'id': auth_result['user_id'],
+                'username': auth_result['username'],
+                'email': auth_result['email'],
+                'nombre': auth_result['nombre'],
+                'rol': auth_result['rol'],
+                'activo': auth_result['activo'],
+                'ultimo_acceso': auth_result['ultimo_acceso'],
+                'created_at': datetime.utcnow(),  # Placeholder
+                'updated_at': datetime.utcnow()   # Placeholder
+            }
+            
+            return Usuario(**user_data)
             
         except Exception as e:
             print(f"Error en autenticación: {e}")
             return None
+    
+    @staticmethod
+    async def change_user_password(user_id: str, old_password: str, new_password: str) -> bool:
+        """Cambiar contraseña de usuario"""
+        try:
+            response = supabase_client.rpc('change_password', {
+                'user_id_param': user_id,
+                'old_password': old_password,
+                'new_password': new_password
+            }).execute()
+            
+            if response.data and len(response.data) > 0:
+                result = response.data[0]
+                return result.get('success', False)
+            
+            return False
+            
+        except Exception as e:
+            print(f"Error cambiando contraseña: {e}")
+            return False
     
     @staticmethod
     async def get_current_user(token: str) -> Usuario:

@@ -48,6 +48,26 @@ async def login(login_data: LoginRequest):
     )
 
 
+@router.post("/change-password")
+async def change_password(
+    old_password: str,
+    new_password: str,
+    current_user: Usuario = Depends(get_current_active_user)
+):
+    """Cambiar contraseña del usuario actual"""
+    success = await AuthService.change_user_password(
+        current_user.id, old_password, new_password
+    )
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo cambiar la contraseña. Verifica que la contraseña actual sea correcta."
+        )
+    
+    return {"message": "Contraseña cambiada exitosamente"}
+
+
 @router.get("/me", response_model=Usuario)
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Obtener información del usuario actual"""
