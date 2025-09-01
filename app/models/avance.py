@@ -27,7 +27,7 @@ class SyncStatus(str, Enum):
 
 class AvanceBase(BaseModel):
     fecha: datetime = Field(..., description="Fecha del avance")
-    torre: str = Field(..., regex="^[A-J]$", description="Torre (A-J)")
+    torre: str = Field(..., pattern="^[A-J]$", description="Torre (A-J)")
     piso: Optional[int] = Field(None, ge=1, le=20, description="Piso (1-20)")
     sector: Optional[Sector] = Field(None, description="Sector de la unidad")
     tipo_espacio: TipoEspacio = Field(..., description="Tipo de espacio")
@@ -43,7 +43,7 @@ class AvanceCreate(AvanceBase):
 
 class AvanceUpdate(BaseModel):
     fecha: Optional[datetime] = None
-    torre: Optional[str] = Field(None, regex="^[A-J]$")
+    torre: Optional[str] = Field(None, pattern="^[A-J]$")
     piso: Optional[int] = Field(None, ge=1, le=20)
     sector: Optional[Sector] = None
     tipo_espacio: Optional[TipoEspacio] = None

@@ -5,6 +5,7 @@ Configuración de la aplicación Tkinter
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from typing import List
 
 # Cargar variables de entorno
 load_dotenv()

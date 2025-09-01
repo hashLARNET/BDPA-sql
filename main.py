@@ -13,9 +13,9 @@ from app.services.supabase_client import supabase_client
 async def lifespan(app: FastAPI):
     """Gestión del ciclo de vida de la aplicación"""
     # Startup
-    print(f"🚀 Iniciando {settings.APP_NAME} v{settings.APP_VERSION}")
-    print(f"🔧 Modo debug: {'Habilitado' if settings.DEBUG else 'Deshabilitado'}")
-    print(f"🌐 CORS habilitado para: {', '.join(settings.ALLOWED_ORIGINS)}")
+    print(f"Iniciando {settings.APP_NAME} v{settings.APP_VERSION}")
+    print(f"Modo debug: {'Habilitado' if settings.DEBUG else 'Deshabilitado'}")
+    print(f"CORS habilitado para: {', '.join(settings.ALLOWED_ORIGINS)}")
     
     # Verificar conexión con Supabase
     try:

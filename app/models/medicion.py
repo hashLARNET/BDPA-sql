@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Dict, Any, Union
 from datetime import datetime
 from enum import Enum
@@ -42,20 +42,21 @@ class ValoresMedicion(BaseModel):
 
 class MedicionBase(BaseModel):
     fecha: datetime = Field(..., description="Fecha de la medición")
-    torre: str = Field(..., regex="^[A-J]$", description="Torre (A-J)")
+    torre: str = Field(..., pattern="^[A-J]$", description="Torre (A-J)")
     piso: int = Field(..., ge=1, le=20, description="Piso (1-20)")
     identificador: str = Field(..., min_length=1, max_length=20, description="Identificador de la unidad")
     tipo_medicion: TipoMedicion = Field(..., description="Tipo de medición")
     valores: ValoresMedicion = Field(..., description="Valores de la medición")
     observaciones: Optional[str] = Field(None, max_length=500, description="Observaciones adicionales")
 
-    @validator('valores')
-    def validate_valores_por_tipo(cls, v, values):
+    @field_validator('valores')
+    @classmethod
+    def validate_valores_por_tipo(cls, v, info):
         """Validar que los valores correspondan al tipo de medición"""
-        if 'tipo_medicion' not in values:
+        if 'tipo_medicion' not in info.data:
             return v
         
-        tipo = values['tipo_medicion']
+        tipo = info.data['tipo_medicion']
         
         if tipo == TipoMedicion.ALAMBRICO_T1 and v.alambrico_t1 is None:
             raise ValueError("Se requiere valor alámbrico T1")
@@ -79,7 +80,7 @@ class MedicionCreate(MedicionBase):
 
 class MedicionUpdate(BaseModel):
     fecha: Optional[datetime] = None
-    torre: Optional[str] = Field(None, regex="^[A-J]$")
+    torre: Optional[str] = Field(None, pattern="^[A-J]$")
     piso: Optional[int] = Field(None, ge=1, le=20)
     identificador: Optional[str] = Field(None, min_length=1, max_length=20)
     tipo_medicion: Optional[TipoMedicion] = None

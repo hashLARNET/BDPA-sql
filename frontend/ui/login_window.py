@@ -23,9 +23,9 @@ class LoginWindow:
         self.config = Config()
         
         self.window = None
-        self.username_var = tk.StringVar()
-        self.password_var = tk.StringVar()
-        self.remember_var = tk.BooleanVar(value=True)
+        self.username_var = None
+        self.password_var = None
+        self.remember_var = None
         self.loading = False
     
     def show(self):
@@ -34,6 +34,11 @@ class LoginWindow:
         self.window.title(f"{self.config.APP_TITLE} - Iniciar Sesión")
         self.window.geometry("400x500")
         self.window.resizable(False, False)
+        
+        # Inicializar variables de Tkinter después de crear la ventana
+        self.username_var = tk.StringVar()
+        self.password_var = tk.StringVar()
+        self.remember_var = tk.BooleanVar(value=True)
         
         # Centrar ventana
         self.center_window()
