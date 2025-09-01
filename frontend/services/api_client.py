@@ -16,11 +16,29 @@ class APIClient:
         self.session = requests.Session()
         self.token = None
         
+        # Configurar timeout por defecto
+        self.session.timeout = 30
+        
         # Configurar headers por defecto
         self.session.headers.update({
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'User-Agent': 'BDPA-Desktop/1.0.0'
         })
+        
+        # Configurar reintentos
+        from requests.adapters import HTTPAdapter
+        from urllib3.util.retry import Retry
+        
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+        )
+        
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)
     
     def set_token(self, token: str):
         """Configurar token de autenticación"""
@@ -39,18 +57,24 @@ class APIClient:
         """Realizar petición HTTP"""
         url = f"{self.base_url}{endpoint}"
         
+        # Configurar timeout si no se especifica
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = 30
+        
         try:
             response = self.session.request(method, url, **kwargs)
             return response
+        except requests.exceptions.Timeout:
+            raise APIException("Timeout: El servidor tardó demasiado en responder")
+        except requests.exceptions.ConnectionError:
+            raise APIException("Error de conexión: No se puede conectar al servidor")
         except requests.exceptions.RequestException as e:
-            raise APIException(f"Error de conexión: {str(e)}")
+            raise APIException(f"Error de red: {str(e)}")
     
     def _handle_response(self, response: requests.Response) -> Dict[Any, Any]:
         """Manejar respuesta de la API"""
         try:
-            if response.status_code == 200:
-                return response.json()
-            elif response.status_code == 201:
+            if response.status_code in [200, 201]:
                 return response.json()
             elif response.status_code == 204:
                 return {}
@@ -61,13 +85,36 @@ class APIClient:
             elif response.status_code == 404:
                 raise APIException("Recurso no encontrado.")
             elif response.status_code == 422:
-                error_detail = response.json().get('detail', 'Error de validación')
-                raise APIException(f"Error de validación: {error_detail}")
+                try:
+                    error_detail = response.json().get('detail', 'Error de validación')
+                    if isinstance(error_detail, list):
+                        # Formatear errores de validación de Pydantic
+                        errors = []
+                        for error in error_detail:
+                            field = ' -> '.join(str(loc) for loc in error.get('loc', []))
+                            msg = error.get('msg', 'Error de validación')
+                            errors.append(f"{field}: {msg}")
+                        raise APIException(f"Errores de validación:\n" + '\n'.join(errors))
+                    else:
+                        raise APIException(f"Error de validación: {error_detail}")
+                except json.JSONDecodeError:
+                    raise APIException("Error de validación en el servidor")
             else:
-                error_msg = response.json().get('detail', f'Error HTTP {response.status_code}')
-                raise APIException(error_msg)
+                try:
+                    error_msg = response.json().get('detail', f'Error HTTP {response.status_code}')
+                    raise APIException(error_msg)
+                except json.JSONDecodeError:
+                    raise APIException(f"Error HTTP {response.status_code}: {response.text[:200]}")
         except json.JSONDecodeError:
             raise APIException(f"Error HTTP {response.status_code}: {response.text}")
+    
+    def test_connection(self) -> bool:
+        """Probar conexión con la API"""
+        try:
+            response = self._make_request('GET', '/health', timeout=5)
+            return response.status_code == 200
+        except:
+            return False
     
     # Métodos de autenticación
     def login(self, username: str, password: str) -> Dict[str, Any]:

@@ -1,248 +1,172 @@
-# BDPA Los Encinos - Backend API
+# BDPA Los Encinos - Sistema de Gestión de Obras
 
-Sistema de gestión de obras de telecomunicaciones desarrollado en Python con FastAPI.
+Sistema completo de gestión de obras de telecomunicaciones desarrollado en **Python puro**, compuesto por un backend API con FastAPI y una aplicación de escritorio con Tkinter.
 
-## 🚀 Características
+## 🏗️ Arquitectura del Sistema
 
-- **API RESTful** completa con FastAPI
+```
+BDPA Los Encinos/
+├── Backend API (FastAPI)     # Servidor REST con Supabase
+├── Frontend Desktop (Tkinter) # Aplicación de escritorio nativa
+└── Base de Datos (Supabase)   # PostgreSQL con Storage
+```
+
+## 🚀 Características Principales
+
+### **Backend API (FastAPI)**
+- **API RESTful** completa con documentación automática
 - **Autenticación JWT** para seguridad
 - **Integración con Supabase** para base de datos y storage
 - **Validación de datos** con Pydantic
-- **Documentación automática** con Swagger/OpenAPI
 - **Manejo de archivos** para fotos de avances
 - **Dashboard** con estadísticas en tiempo real
 - **Filtros avanzados** para consultas
-- **Manejo de errores** robusto
 
-## 📋 Requisitos
+### **Frontend Desktop (Tkinter)**
+- **Interfaz nativa** multiplataforma (Windows, macOS, Linux)
+- **Gestión completa** de avances, mediciones y usuarios
+- **Autenticación** con recordar sesión
+- **Manejo offline** con sincronización automática
+- **Subida de fotos** integrada
+- **Dashboard visual** con estadísticas
 
-- Python 3.9+
-- Cuenta de Supabase configurada
-- Base de datos PostgreSQL (via Supabase)
+### **Base de Datos (Supabase)**
+- **PostgreSQL** con Row Level Security (RLS)
+- **Storage** para archivos y fotos
+- **Funciones** para cálculos complejos
+- **Vistas** optimizadas para consultas
+- **Auditoría** completa de cambios
 
-## 🛠 Instalación
+## 📋 Requisitos del Sistema
 
-1. **Clonar el repositorio**
+- **Python 3.9+**
+- **Cuenta de Supabase** configurada
+- **Conexión a internet** (para comunicación con Supabase)
+
+## 🛠 Instalación Rápida
+
+### 1. **Clonar y Configurar**
 ```bash
 git clone <repository-url>
-cd bdpa-los-encinos-backend
-```
+cd bdpa-los-encinos
 
-2. **Crear entorno virtual**
-```bash
+# Crear entorno virtual
 python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
-```
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-3. **Instalar dependencias**
-```bash
+# Instalar dependencias
 pip install -r requirements.txt
 ```
 
-4. **Configurar variables de entorno**
+### 2. **Configurar Variables de Entorno**
 ```bash
 cp .env.example .env
 # Editar .env con tus credenciales de Supabase
 ```
 
-5. **Ejecutar la aplicación**
+### 3. **Configurar Supabase**
+1. Crear proyecto en [Supabase](https://supabase.com)
+2. Ejecutar migraciones SQL desde `supabase/migrations/`
+3. Configurar buckets de Storage
+4. Obtener URL y claves del proyecto
+
+### 4. **Ejecutar Aplicaciones**
+
+**Backend (Terminal 1):**
 ```bash
 python main.py
+# API disponible en http://localhost:8000
 ```
 
-La API estará disponible en `http://localhost:8000`
+**Frontend Desktop (Terminal 2):**
+```bash
+cd frontend
+python run.py
+```
 
-## 📚 Documentación de la API
+## 📚 Documentación Detallada
 
-Una vez ejecutando la aplicación, puedes acceder a:
+### **Backend API**
+- **Documentación**: `http://localhost:8000/docs` (Swagger UI)
+- **Configuración**: Ver `app/config.py`
+- **Endpoints**: Ver `app/routers/`
+- **Modelos**: Ver `app/models/`
 
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
+### **Frontend Desktop**
+- **Configuración**: Ver `frontend/config.py`
+- **Componentes UI**: Ver `frontend/ui/`
+- **Servicios**: Ver `frontend/services/`
+- **Utilidades**: Ver `frontend/utils/`
 
-## 🔧 Configuración
+### **Base de Datos**
+- **Migraciones**: Ver `supabase/migrations/`
+- **Configuración**: Ver `README_SUPABASE.md`
 
-### Variables de Entorno
+## 🔧 Configuración Avanzada
 
-Crea un archivo `.env` basado en `.env.example`:
-
+### **Variables de Entorno Principales**
 ```env
-# Supabase Configuration
+# Supabase
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-supabase-anon-key
-SUPABASE_SERVICE_KEY=your-supabase-service-role-key
+SUPABASE_KEY=your-anon-key
+SUPABASE_SERVICE_KEY=your-service-key
 
-# JWT Configuration
-SECRET_KEY=your-super-secret-jwt-key-here
-ALGORITHM=HS256
+# JWT
+SECRET_KEY=your-secret-key
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# Application Configuration
-APP_NAME=BDPA - Los Encinos API
-APP_VERSION=1.0.0
+# API
+API_BASE_URL=http://localhost:8000
 DEBUG=True
 
-# CORS Configuration
-ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+# Frontend
+WINDOW_WIDTH=1200
+WINDOW_HEIGHT=800
 ```
 
-### Configuración de Supabase
+### **Estructura de Datos**
 
-1. Crea un proyecto en [Supabase](https://supabase.com)
-2. Ejecuta las migraciones SQL ubicadas en `supabase/migrations/`
-3. Configura los buckets de Storage:
-   - `avances-fotos` para fotos de avances
-   - `mediciones-docs` para documentos de mediciones
+#### **Usuarios**
+- **Roles**: Admin, Supervisor, Técnico, Ayudante
+- **Permisos**: Basados en rol con RLS
+- **Autenticación**: JWT con expiración configurable
 
-## 📖 Endpoints Principales
+#### **Avances**
+- **Torres**: A-J (10 torres)
+- **Pisos**: 1, 3
+- **Sectores**: Norte, Poniente, Oriente
+- **Tipos**: unidad, sotu, shaft, lateral, antena
+- **Progreso**: 0-100%
 
-### Autenticación
-- `POST /auth/login` - Iniciar sesión
-- `GET /auth/me` - Obtener usuario actual
-- `POST /auth/logout` - Cerrar sesión
+#### **Mediciones**
+- **Tipos**: alámbrico-t1, alámbrico-t2, coaxial, fibra, wifi, certificación
+- **Estados**: OK, ADVERTENCIA, FALLA (calculado automáticamente)
+- **Rangos**: Validación automática según tipo
 
-### Usuarios
-- `GET /usuarios/` - Listar usuarios
-- `POST /usuarios/` - Crear usuario (Admin)
-- `GET /usuarios/{id}` - Obtener usuario
-- `PUT /usuarios/{id}` - Actualizar usuario
-- `DELETE /usuarios/{id}` - Desactivar usuario (Admin)
+## 🧪 Testing y Desarrollo
 
-### Avances
-- `GET /avances/` - Listar avances con filtros
-- `POST /avances/` - Crear avance
-- `GET /avances/{id}` - Obtener avance
-- `PUT /avances/{id}` - Actualizar avance
-- `DELETE /avances/{id}` - Eliminar avance (Supervisor/Admin)
-
-### Mediciones
-- `GET /mediciones/` - Listar mediciones con filtros
-- `POST /mediciones/` - Crear medición
-- `GET /mediciones/{id}` - Obtener medición
-- `PUT /mediciones/{id}` - Actualizar medición
-- `DELETE /mediciones/{id}` - Eliminar medición (Supervisor/Admin)
-
-### Dashboard
-- `GET /dashboard/` - Datos completos del dashboard
-- `GET /dashboard/summary` - Resumen general
-- `GET /dashboard/tower-progress` - Progreso por torre
-- `GET /dashboard/mediciones-estado` - Estado de mediciones
-
-## 🏗 Estructura del Proyecto
-
-```
-app/
-├── __init__.py
-├── config.py              # Configuración de la aplicación
-├── main.py                # Punto de entrada
-├── models/                # Modelos Pydantic
-│   ├── __init__.py
-│   ├── auth.py
-│   ├── usuario.py
-│   ├── avance.py
-│   ├── medicion.py
-│   └── dashboard.py
-├── routers/               # Endpoints de la API
-│   ├── __init__.py
-│   ├── auth.py
-│   ├── usuarios.py
-│   ├── avances.py
-│   ├── mediciones.py
-│   └── dashboard.py
-├── services/              # Lógica de negocio
-│   ├── __init__.py
-│   ├── supabase_client.py
-│   ├── auth_service.py
-│   ├── usuario_service.py
-│   ├── avance_service.py
-│   ├── medicion_service.py
-│   └── dashboard_service.py
-└── utils/                 # Utilidades
-    ├── __init__.py
-    ├── validators.py
-    └── helpers.py
-```
-
-## 🔐 Autenticación y Autorización
-
-La API utiliza JWT (JSON Web Tokens) para autenticación:
-
-1. **Login**: `POST /auth/login` con username/password
-2. **Token**: Incluir en header `Authorization: Bearer <token>`
-3. **Roles**: Admin, Supervisor, Técnico, Ayudante
-
-### Permisos por Rol
-
-- **Admin**: Acceso completo
-- **Supervisor**: Gestión de avances/mediciones + eliminación
-- **Técnico**: Crear/editar avances y mediciones
-- **Ayudante**: Solo lectura y creación básica
-
-## 📊 Modelos de Datos
-
-### Usuario
-```python
-{
-  "id": "uuid",
-  "username": "string",
-  "nombre": "string", 
-  "rol": "Admin|Supervisor|Tecnico|Ayudante",
-  "activo": true,
-  "ultimo_acceso": "datetime"
-}
-```
-
-### Avance
-```python
-{
-  "id": "uuid",
-  "fecha": "datetime",
-  "torre": "A-J",
-  "piso": 1-20,
-  "sector": "Norte|Poniente|Oriente",
-  "tipo_espacio": "unidad|sotu|shaft|lateral|antena",
-  "ubicacion": "string",
-  "categoria": "string",
-  "porcentaje": 0-100,
-  "foto_url": "string",
-  "observaciones": "string"
-}
-```
-
-### Medición
-```python
-{
-  "id": "uuid",
-  "fecha": "datetime",
-  "torre": "A-J",
-  "piso": 1-20,
-  "identificador": "string",
-  "tipo_medicion": "alambrico-t1|alambrico-t2|coaxial|fibra|wifi|certificacion",
-  "valores": {...},
-  "estado": "OK|ADVERTENCIA|FALLA",
-  "observaciones": "string"
-}
-```
-
-## 🧪 Testing
-
-Para ejecutar las pruebas:
-
+### **Probar Backend**
 ```bash
-# Instalar dependencias de testing
-pip install pytest pytest-asyncio httpx
+# Verificar salud de la API
+python scripts/test_api.py
 
-# Ejecutar pruebas
-pytest
+# Ejecutar con recarga automática
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+### **Probar Frontend**
+```bash
+cd frontend
+python run.py
+```
+
+### **Credenciales de Desarrollo**
+- **Usuario**: `admin`
+- **Contraseña**: `password123` (temporal)
 
 ## 🚀 Despliegue
 
-### Desarrollo
-```bash
-python main.py
-```
-
-### Producción
+### **Backend (Producción)**
 ```bash
 # Con Gunicorn
 pip install gunicorn
@@ -251,53 +175,132 @@ gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
 # Con Docker
 docker build -t bdpa-api .
 docker run -p 8000:8000 bdpa-api
+
+# Con Docker Compose
+docker-compose up -d
 ```
 
-## 📝 Notas de Desarrollo
+### **Frontend (Distribución)**
+```bash
+# Crear ejecutable
+pip install pyinstaller
+pyinstaller --onefile --windowed --name "BDPA-Los-Encinos" frontend/main.py
+```
 
-### Validación Automática de Mediciones
+## 📊 Funcionalidades Principales
 
-La API calcula automáticamente el estado de las mediciones basado en rangos predefinidos:
+### **Dashboard**
+- Estadísticas generales de la obra
+- Progreso por torres en tiempo real
+- Indicadores de mediciones (OK/Falla)
+- Actividad reciente del equipo
 
-- **Alámbrico/Coaxial**: 45-75 dBμV
-- **Fibra Óptica**: -30 a -8 dBm
-- **WiFi**: -80 a -30 dBm
+### **Gestión de Avances**
+- Registro de progreso con fotografías
+- Filtros por torre, piso, fecha, categoría
+- Validación automática de datos
+- Sincronización con servidor
 
-### Subida de Archivos
+### **Gestión de Mediciones**
+- Mediciones técnicas especializadas
+- Cálculo automático de estados
+- Validación de rangos por tipo
+- Exportación de reportes
 
-Las fotos de avances se suben automáticamente a Supabase Storage con:
-- Validación de tipo de archivo
-- Límite de tamaño (10MB)
-- Nombres únicos con UUID
-- Organización por fecha
+### **Gestión de Usuarios**
+- Creación y edición de usuarios (Admin)
+- Asignación de roles y permisos
+- Historial de accesos
+- Activación/desactivación
 
-### Filtros Avanzados
+## 🔐 Seguridad
 
-Todos los endpoints de listado soportan filtros múltiples:
-- Por torre, piso, sector
-- Por rango de fechas
-- Búsqueda de texto
-- Paginación con limit/offset
+### **Autenticación**
+- JWT con expiración configurable
+- Verificación de tokens en cada request
+- Logout seguro con limpieza de sesión
 
-## 🤝 Contribución
+### **Autorización**
+- Row Level Security (RLS) en Supabase
+- Permisos basados en roles
+- Validación en backend y frontend
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+### **Datos**
+- Validación estricta con Pydantic
+- Sanitización de inputs
+- Auditoría completa de cambios
 
-## 📄 Licencia
+## 🔧 Mantenimiento
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+### **Logs y Monitoreo**
+```sql
+-- Ver actividad reciente
+SELECT * FROM auditoria ORDER BY fecha DESC LIMIT 50;
 
-## 📞 Soporte
+-- Ver estadísticas generales
+SELECT * FROM calcular_progreso_obra();
 
-Para soporte técnico o preguntas:
-- Crear un issue en GitHub
-- Contactar al equipo de desarrollo
+-- Limpiar datos antiguos
+SELECT limpiar_auditoria_antigua();
+SELECT limpiar_cola_sync();
+```
+
+### **Backup y Restauración**
+- Backup automático de Supabase
+- Exportación de datos en JSON
+- Restauración desde backup
+
+## 🐛 Troubleshooting
+
+### **Problemas Comunes**
+
+1. **"Backend no disponible"**
+   - Verificar que FastAPI esté ejecutándose en puerto 8000
+   - Comprobar variables de entorno en `.env`
+   - Verificar conexión con Supabase
+
+2. **"Error de autenticación"**
+   - Verificar credenciales de usuario
+   - Comprobar configuración JWT
+   - Revisar políticas RLS en Supabase
+
+3. **"Error de sincronización"**
+   - Verificar conexión a internet
+   - Comprobar estado de Supabase
+   - Revisar logs de la aplicación
+
+### **Verificaciones de Salud**
+```bash
+# Verificar backend
+curl http://localhost:8000/health
+
+# Verificar conexión Supabase
+python -c "from app.services.supabase_client import supabase_client; print(supabase_client.table('usuarios').select('count').execute())"
+
+# Probar autenticación
+python scripts/test_api.py
+```
+
+## 📞 Soporte y Contribución
+
+### **Estructura del Código**
+- **Backend**: Arquitectura modular con separación clara de responsabilidades
+- **Frontend**: Componentes reutilizables con gestión de estado
+- **Base de Datos**: Esquema normalizado con optimizaciones
+
+### **Mejores Prácticas**
+- Validación en múltiples capas
+- Manejo de errores robusto
+- Logging comprehensivo
+- Testing automatizado
+
+### **Contribuir**
+1. Fork del proyecto
+2. Crear rama para feature
+3. Implementar cambios con tests
+4. Crear Pull Request
 
 ---
 
-**BDPA Los Encinos** - Sistema de Gestión de Obras de Telecomunicaciones
-```
+**BDPA Los Encinos** - Sistema Integral de Gestión de Obras de Telecomunicaciones  
+*Desarrollado con Python, FastAPI, Tkinter y Supabase*

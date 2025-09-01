@@ -14,19 +14,37 @@ async def lifespan(app: FastAPI):
     """Gestión del ciclo de vida de la aplicación"""
     # Startup
     print(f"🚀 Iniciando {settings.APP_NAME} v{settings.APP_VERSION}")
+    print(f"🔧 Modo debug: {'Habilitado' if settings.DEBUG else 'Deshabilitado'}")
+    print(f"🌐 CORS habilitado para: {', '.join(settings.ALLOWED_ORIGINS)}")
     
     # Verificar conexión con Supabase
     try:
-        # Test de conexión básica
+        # Test de conexión más robusto
         response = supabase_client.table('usuarios').select('count').execute()
+        usuarios_count = len(response.data) if response.data else 0
         print("✅ Conexión con Supabase establecida")
+        print(f"📊 Usuarios en sistema: {usuarios_count}")
+        
+        # Verificar buckets de Storage
+        try:
+            buckets = supabase_client.storage.list_buckets()
+            bucket_names = [b.name for b in buckets] if buckets else []
+            if 'avances-fotos' in bucket_names and 'mediciones-docs' in bucket_names:
+                print("✅ Buckets de Storage configurados correctamente")
+            else:
+                print("⚠️  Algunos buckets de Storage no están configurados")
+        except Exception as storage_error:
+            print(f"⚠️  Error verificando Storage: {storage_error}")
+            
     except Exception as e:
-        print(f"❌ Error conectando con Supabase: {e}")
+        print(f"❌ Error crítico conectando con Supabase: {e}")
+        print("💡 Verifica las variables SUPABASE_URL y SUPABASE_KEY en .env")
     
     yield
     
     # Shutdown
-    print("🛑 Cerrando aplicación")
+    print("🛑 Cerrando aplicación BDPA Los Encinos")
+    print("👋 ¡Hasta luego!")
 
 
 # Crear instancia de FastAPI

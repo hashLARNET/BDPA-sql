@@ -74,15 +74,33 @@ class AuthService:
             
             user_data = response.data[0]
             
-            # Por ahora, usamos una validación simple (en producción debería usar hash)
-            # TODO: Implementar hash de contraseñas en la base de datos
-            if password == "password123":  # Contraseña temporal para desarrollo
-                # Actualizar último acceso
-                supabase_client.table('usuarios').update({
-                    'ultimo_acceso': datetime.utcnow().isoformat()
-                }).eq('id', user_data['id']).execute()
-                
-                return Usuario(**user_data)
+            # LIMITACIÓN CRÍTICA: El esquema actual de Supabase no incluye una columna 
+            # para contraseñas hasheadas en la tabla 'usuarios'. Para implementar 
+            # seguridad adecuada, se requiere:
+            # 1. Agregar columna 'password_hash' a la tabla usuarios
+            # 2. Migrar usuarios existentes con contraseñas hasheadas
+            # 3. Actualizar esta función para usar verify_password()
+            #
+            # Implementación temporal para desarrollo:
+            if 'password_hash' in user_data and user_data['password_hash']:
+                # Si existe hash en BD, usar verificación segura
+                if AuthService.verify_password(password, user_data['password_hash']):
+                    # Actualizar último acceso
+                    supabase_client.table('usuarios').update({
+                        'ultimo_acceso': datetime.utcnow().isoformat()
+                    }).eq('id', user_data['id']).execute()
+                    
+                    return Usuario(**user_data)
+            else:
+                # Fallback temporal para desarrollo (INSEGURO)
+                # TODO: ELIMINAR en producción una vez implementado el esquema de contraseñas
+                if password == "password123":
+                    # Actualizar último acceso
+                    supabase_client.table('usuarios').update({
+                        'ultimo_acceso': datetime.utcnow().isoformat()
+                    }).eq('id', user_data['id']).execute()
+                    
+                    return Usuario(**user_data)
             
             return None
             

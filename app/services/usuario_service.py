@@ -53,9 +53,22 @@ class UsuarioService:
                     detail="El nombre de usuario ya existe"
                 )
             
-            # Crear usuario (sin hash de contraseña por ahora)
+            # LIMITACIÓN CRÍTICA: El esquema actual de Supabase no incluye una columna 
+            # para contraseñas hasheadas en la tabla 'usuarios'. Para implementar 
+            # seguridad adecuada, se requiere:
+            # 1. Agregar columna 'password_hash' a la tabla usuarios
+            # 2. Usar AuthService.get_password_hash() para hashear contraseñas
+            # 3. Almacenar solo el hash, nunca la contraseña en texto plano
+            #
+            # Implementación temporal (INSEGURA):
             user_dict = usuario_data.dict()
-            del user_dict['password']  # Remover password del dict para la BD
+            password = user_dict.pop('password')  # Extraer contraseña
+            
+            # TODO: Una vez que se agregue la columna password_hash a la tabla usuarios:
+            # user_dict['password_hash'] = AuthService.get_password_hash(password)
+            #
+            # Por ahora, la contraseña no se almacena (todos los usuarios usan "password123")
+            # ESTO ES INSEGURO Y DEBE CAMBIARSE EN PRODUCCIÓN
             
             response = supabase_client.table('usuarios').insert(user_dict).execute()
             
