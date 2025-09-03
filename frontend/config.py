@@ -75,9 +75,26 @@ class Config:
     SHOW_DEBUG_INFO = os.getenv('SHOW_DEBUG_INFO', 'False').lower() == 'true'
     
     # Configuración de la obra
-    TORRES = os.getenv('TORRES', 'A,B,C,D,E,F,G,H,I,J').split(',')
-    PISOS = [int(p) for p in os.getenv('PISOS', '1,3').split(',')]
-    SECTORES = os.getenv('SECTORES', 'Norte,Poniente,Oriente').split(',')
+    TORRES_RAW = os.getenv('TORRES', '["A","B","C","D","E","F","G","H","I","J"]')
+    if TORRES_RAW.startswith('[') and TORRES_RAW.endswith(']'):
+        import json
+        TORRES = json.loads(TORRES_RAW)
+    else:
+        TORRES = TORRES_RAW.split(',')
+    
+    PISOS_RAW = os.getenv('PISOS', '[1,3]')
+    if PISOS_RAW.startswith('[') and PISOS_RAW.endswith(']'):
+        import json
+        PISOS = json.loads(PISOS_RAW)
+    else:
+        PISOS = [int(p.strip()) for p in PISOS_RAW.split(',')]
+    
+    SECTORES_RAW = os.getenv('SECTORES', '["Norte","Poniente","Oriente"]')
+    if SECTORES_RAW.startswith('[') and SECTORES_RAW.endswith(']'):
+        import json
+        SECTORES = json.loads(SECTORES_RAW)
+    else:
+        SECTORES = SECTORES_RAW.split(',')
     TIPOS_ESPACIO = os.getenv('TIPOS_ESPACIO', 'unidad,sotu,shaft,lateral,antena').split(',')
     TIPOS_MEDICION = os.getenv('TIPOS_MEDICION', 'alambrico-t1,alambrico-t2,coaxial,fibra,wifi,certificacion').split(',')
     ROLES = os.getenv('ROLES_USUARIO', 'Admin,Supervisor,Tecnico,Ayudante').split(',')

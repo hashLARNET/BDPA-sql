@@ -11,6 +11,20 @@ router = APIRouter()
 security = HTTPBearer()
 
 
+# Dependencia para obtener usuario actual
+async def get_current_active_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Usuario:
+    """Dependencia para obtener el usuario actual autenticado"""
+    user = await AuthService.get_current_user(credentials.credentials)
+    
+    if not user.activo:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Usuario inactivo"
+        )
+    
+    return user
+
+
 @router.post("/login", response_model=Token)
 async def login(login_data: LoginRequest):
     """Iniciar sesión"""
@@ -80,20 +94,6 @@ async def logout():
     # En una implementación JWT stateless, el logout se maneja en el frontend
     # eliminando el token. Aquí podríamos implementar una blacklist si fuera necesario.
     return {"message": "Sesión cerrada exitosamente"}
-
-
-# Dependencia para obtener usuario actual
-async def get_current_active_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Usuario:
-    """Dependencia para obtener el usuario actual autenticado"""
-    user = await AuthService.get_current_user(credentials.credentials)
-    
-    if not user.activo:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Usuario inactivo"
-        )
-    
-    return user
 
 
 # Dependencia para verificar rol de administrador

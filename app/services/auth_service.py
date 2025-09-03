@@ -66,39 +66,76 @@ class AuthService:
     async def authenticate_user(username: str, password: str) -> Optional[Usuario]:
         """Autenticar usuario"""
         try:
-            # Usar función de autenticación de Supabase que maneja contraseñas hasheadas
-            response = supabase_client.rpc('authenticate_user', {
-                'username_param': username,
-                'password_param': password
-            }).execute()
+            print(f"🔐 Intentando autenticar usuario: {username}")
             
-            if not response.data or len(response.data) == 0:
-                return None
-            
-            auth_result = response.data[0]
-            
-            # Verificar si la autenticación fue exitosa
-            if not auth_result.get('success', False):
-                print(f"Autenticación fallida: {auth_result.get('message', 'Error desconocido')}")
-                return None
-            
-            # Crear objeto Usuario con los datos retornados
-            user_data = {
-                'id': auth_result['user_id'],
-                'username': auth_result['username'],
-                'email': auth_result['email'],
-                'nombre': auth_result['nombre'],
-                'rol': auth_result['rol'],
-                'activo': auth_result['activo'],
-                'ultimo_acceso': auth_result['ultimo_acceso'],
-                'created_at': datetime.utcnow(),  # Placeholder
-                'updated_at': datetime.utcnow()   # Placeholder
-            }
-            
-            return Usuario(**user_data)
-            
+            # Intentar primero con función RPC si existe
+            try:
+                response = supabase_client.rpc('authenticate_user', {
+                    'username_param': username,
+                    'password_param': password
+                }).execute()
+                
+                if response.data and len(response.data) > 0:
+                    auth_result = response.data[0]
+                    
+                    # Verificar si la autenticación fue exitosa
+                    if auth_result.get('success', False):
+                        print(f"✅ Autenticación RPC exitosa para: {username}")
+                        
+                        # Crear objeto Usuario con los datos retornados
+                        user_data = {
+                            'id': auth_result['user_id'],
+                            'username': auth_result['username'],
+                            'email': auth_result['email'],
+                            'nombre': auth_result['nombre'],
+                            'rol': auth_result['rol'],
+                            'activo': auth_result['activo'],
+                            'ultimo_acceso': auth_result['ultimo_acceso'],
+                            'created_at': datetime.utcnow(),
+                            'updated_at': datetime.utcnow()
+                        }
+                        
+                        return Usuario(**user_data)
+                    else:
+                        print(f"❌ Autenticación RPC falló: {auth_result.get('message', 'Error desconocido')}")
+                        return None
+                        
+            except Exception as rpc_error:
+                print(f"⚠️ Función RPC no disponible, usando método directo: {rpc_error}")
+                
+                # Método alternativo: consulta directa a la tabla usuarios
+                response = supabase_client.table('usuarios').select('*').eq('username', username).eq('activo', True).execute()
+                
+                if not response.data or len(response.data) == 0:
+                    print(f"❌ Usuario no encontrado: {username}")
+                    return None
+                
+                user_data = response.data[0]
+                stored_hash = user_data.get('password_hash')
+                
+                if not stored_hash:
+                    print(f"❌ No hay hash de contraseña para: {username}")
+                    return None
+                
+                # Verificar contraseña
+                if AuthService.verify_password(password, stored_hash):
+                    print(f"✅ Autenticación directa exitosa para: {username}")
+                    
+                    # Actualizar último acceso
+                    try:
+                        supabase_client.table('usuarios').update({
+                            'ultimo_acceso': datetime.utcnow().isoformat()
+                        }).eq('id', user_data['id']).execute()
+                    except:
+                        pass  # No crítico si falla la actualización
+                    
+                    return Usuario(**user_data)
+                else:
+                    print(f"❌ Contraseña incorrecta para: {username}")
+                    return None
+                    
         except Exception as e:
-            print(f"Error en autenticación: {e}")
+            print(f"💥 Error general en autenticación: {e}")
             return None
     
     @staticmethod
